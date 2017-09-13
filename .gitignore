@@ -4,6 +4,9 @@
 *.so
 *.dylib
 
+# Goglang testing
+.idea/*
+
 # Test binary, build with `go test -c`
 *.test
 
