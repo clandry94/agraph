@@ -11,11 +11,11 @@ func main() {
 		fmt.Println(err)
 	}
 
-	firstNode := agraph.NewNode(agraph.NopFilter)
-	secondNode := agraph.NewNode(agraph.VolumeFilter)
-	thirdNode := agraph.NewNode(agraph.NopFilter)
+	firstNode, _ := agraph.NewNode(agraph.NopFilter)
+	secondNode, _ := agraph.NewNode(agraph.VolumeFilter)
+	thirdNode, _ := agraph.NewNode(agraph.NopFilter)
 
-	firstNode.Sink = secondNode.Source
-	secondNode.Sink = thirdNode.Source
+	firstNode.SetSink(secondNode.Source())
+	secondNode.SetSink(thirdNode.Source())
 
 }

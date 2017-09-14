@@ -1,7 +1,5 @@
 package agraph
 
-import "fmt"
-
 type FilterType int
 
 const (
@@ -14,18 +12,6 @@ const (
 
 type FilterGraph struct {
 	head *Node
-}
-
-func (g FilterGraph) Insert(node *Node) error {
-	return nil
-}
-
-func (g FilterGraph) Remove(node *Node) error {
-	return nil
-}
-
-func (g FilterGraph) Process(data []uint8) {
-
 }
 
 // Filters are implemented as structs which implement the type Node. Filters
@@ -48,13 +34,14 @@ func (g FilterGraph) Process(data []uint8) {
 //
 //	firstNode.Sink = secondNode.Source
 //	secondNode.Sink = thirdNode.Source
-
 type Node interface {
-	process() error
-	do() ([]byte, error)
+	Process() error
+	do(data []byte) ([]byte, error)
+	SetSink(c chan []byte)
+	Source() chan []byte
 }
 
-func NewNode(t FilterType) interface{} {
+func NewNode(t FilterType) (Node, error) {
 	switch t {
 	case NopFilter:
 		return newNop()
@@ -63,76 +50,4 @@ func NewNode(t FilterType) interface{} {
 	default:
 		return newNop()
 	}
-}
-
-/*
-	Null operation filter. Does nothing.
-*/
-type Nop struct {
-	Source chan []byte
-	Sink   chan []byte
-}
-
-func newNop() interface{} {
-	return Nop{
-		Source: make(chan []byte, SOURCE_SIZE),
-		Sink:   nil,
-	}
-}
-
-func (n Nop) process() error {
-	for {
-		select {
-		case data := <-n.Source:
-			fmt.Println("found data")
-			var filteredData, err = n.do(data)
-
-			if err != nil {
-				panic("Could not filter!")
-			}
-			n.Sink <- filteredData
-		}
-	}
-	return nil
-}
-
-func (n Nop) do(data []byte) ([]byte, error) {
-	return data, nil
-}
-
-/*
-	Changes volume amount
-*/
-type Volume struct {
-	Source     chan []byte
-	Sink       chan []byte
-	Multiplier int
-}
-
-func newVolume(multiplier int) interface{} {
-	return Volume{
-		Source:     make(chan []byte, SOURCE_SIZE),
-		Sink:       nil,
-		Multiplier: multiplier,
-	}
-}
-
-func (n Volume) process() error {
-	for {
-		select {
-		case data := <-n.Source:
-			fmt.Println("found data")
-			var filteredData, err = n.do(data)
-
-			if err != nil {
-				panic("Could not filter!")
-			}
-			n.Sink <- filteredData
-		}
-	}
-	return nil
-}
-
-func (n Volume) do(data []byte) ([]byte, error) {
-	return data, nil
 }
