@@ -1,23 +1,23 @@
 package agraph
 
 import (
-	id3 "github.com/clandry94/id3-go"
 	"fmt"
+	id3 "github.com/clandry94/id3-go"
 	"os"
 )
 
 type Graph struct {
-	MetaData MetaData
-	Codec Codec
-	source *[]byte
-	sink *[]byte
+	MetaData    MetaData
+	Codec       Codec
+	source      *[]byte
+	sink        *[]byte
 	filterGraph *FilterGraph
 }
 
 type MetaData struct {
-	Id3 id3.Tagger
+	Id3      id3.Tagger
 	Filepath string
-	Size int64
+	Size     int64
 }
 
 func New(filepath string) (*Graph, error) {
@@ -27,10 +27,10 @@ func New(filepath string) (*Graph, error) {
 		return nil, err
 	}
 
-  	file, err := os.OpenFile(filepath, os.O_RDWR, 0666)
-  	if err != nil {
-  		return nil, err
-  	}
+	file, err := os.OpenFile(filepath, os.O_RDWR, 0666)
+	if err != nil {
+		return nil, err
+	}
 
 	id3Data, err := id3.Parse(file)
 	if err != nil {
@@ -39,9 +39,9 @@ func New(filepath string) (*Graph, error) {
 	}
 
 	meta := MetaData{
-		Id3: id3Data.Tagger,
+		Id3:      id3Data.Tagger,
 		Filepath: filepath,
-		Size: fileInfo.Size(),
+		Size:     fileInfo.Size(),
 	}
 
 	codec := Mp3{
@@ -49,13 +49,10 @@ func New(filepath string) (*Graph, error) {
 	}
 
 	return &Graph{
-		MetaData: meta,
-		Codec: codec,
-		source: nil,
-		sink: nil,
+		MetaData:    meta,
+		Codec:       codec,
+		source:      nil,
+		sink:        nil,
 		filterGraph: nil,
 	}, nil
 }
-
-
-
