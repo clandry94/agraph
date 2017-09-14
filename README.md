@@ -1,2 +1,2 @@
 # agraph
-AGraph, is a graph based audio processing library for Go
+AGraph is a graph based audio processing library for Go
