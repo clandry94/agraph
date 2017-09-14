@@ -10,10 +10,6 @@ const (
 	SOURCE_SIZE = 512
 )
 
-type FilterGraph struct {
-	head *Node
-}
-
 // Filters are implemented as structs which implement the type Node. Filters
 // are initialized with their source channel created and sink channel as nil.
 // In order to connect filters, set the sink of each node to the next node's source.

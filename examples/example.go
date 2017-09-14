@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	ag, err := agraph.New("example.mp3");
+	_, err := agraph.New("example.mp3");
 	if err != nil {
 		fmt.Println(err)
 	}

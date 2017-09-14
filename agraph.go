@@ -11,7 +11,7 @@ type Graph struct {
 	Codec       Codec
 	source      *[]byte
 	sink        *[]byte
-	filterGraph *FilterGraph
+	root *Node
 }
 
 type MetaData struct {
@@ -53,6 +53,6 @@ func New(filepath string) (*Graph, error) {
 		Codec:       codec,
 		source:      nil,
 		sink:        nil,
-		filterGraph: nil,
+		root: nil,
 	}, nil
 }
