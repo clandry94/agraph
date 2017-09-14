@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/clandry94/agraph"
 	"fmt"
+	"github.com/clandry94/agraph"
 )
 
 func main() {
-	_, err := agraph.New("example.mp3");
+	ar, err := agraph.New("test.mp3")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -17,5 +17,10 @@ func main() {
 
 	firstNode.SetSink(secondNode.Source())
 	secondNode.SetSink(thirdNode.Source())
+
+	fmt.Println(ar.MetaData.Id3.Title())
+	fmt.Println(ar.MetaData.Id3.Artist())
+	fmt.Println(ar.MetaData.Id3.Year())
+	fmt.Println(ar.MetaData.Id3.Genre())
 
 }

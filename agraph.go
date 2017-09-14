@@ -7,11 +7,11 @@ import (
 )
 
 type Graph struct {
-	MetaData    MetaData
-	Codec       Codec
-	source      *[]byte
-	sink        *[]byte
-	root *Node
+	MetaData MetaData
+	Codec    Codec
+	source   *[]byte
+	sink     *[]byte
+	root     *Node
 }
 
 type MetaData struct {
@@ -49,10 +49,10 @@ func New(filepath string) (*Graph, error) {
 	}
 
 	return &Graph{
-		MetaData:    meta,
-		Codec:       codec,
-		source:      nil,
-		sink:        nil,
-		root: nil,
+		MetaData: meta,
+		Codec:    codec,
+		source:   nil,
+		sink:     nil,
+		root:     nil,
 	}, nil
 }
