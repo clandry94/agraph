@@ -1,0 +1,5 @@
+language: go
+go:
+  - 1.9
+install:
+  - go get github.com/clandry94/id3-go
