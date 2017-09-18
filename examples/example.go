@@ -6,10 +6,12 @@ import (
 )
 
 func main() {
-	ar, err := agraph.New("test.mp3")
+	ar, err := agraph.New("test.wav")
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	fmt.Println(ar.Meta)
 
 	firstNode, _ := agraph.NewNode(agraph.NopFilter)
 	secondNode, _ := agraph.NewNode(agraph.VolumeFilter)
@@ -17,10 +19,5 @@ func main() {
 
 	firstNode.SetSink(secondNode.Source())
 	secondNode.SetSink(thirdNode.Source())
-
-	fmt.Println(ar.MetaData.Id3.Title())
-	fmt.Println(ar.MetaData.Id3.Artist())
-	fmt.Println(ar.MetaData.Id3.Year())
-	fmt.Println(ar.MetaData.Id3.Genre())
 
 }

@@ -2,6 +2,10 @@ package agraph
 
 import (
 	"io"
+	"os"
+	"fmt"
+	"io/ioutil"
+	"bytes"
 )
 
 /*
@@ -108,8 +112,32 @@ type WaveReader struct {
 	SampleTime int
 }
 
+func NewWaveReader(fp *os.File) (reader *WaveReader, err error) {
+	defer fp.Close()
+	fStat, err := fp.Stat()
+	if err != nil {
+		return reader, err
+	}
+
+	if fStat.Size() > maxFileSize {
+		return reader, fmt.Errorf("File size (%v bytes) is too large", fStat.Size())
+	}
+
+	data, err := ioutil.ReadAll(fp)
+	if err != nil {
+		return reader, err
+	}
+
+	reader.size = fStat.Size()
+	reader.in = bytes.NewReader(data)
+
+	/*
+		TODO: Need to parse riff, fmt, list, and data chunks here
+	 */
+
+	return reader, nil
+}
+
 //func WavFormatReader(r io.Reader, n int64) io.Reader { return &WaveReader{r, n }}
 
-func (w WaveReader) Read(p []byte) (n int, err error) {
-	return 0, nil
-}
+func (w WaveReader) Read(p []byte) (n int, err error) { return 0, nil }
