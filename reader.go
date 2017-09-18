@@ -214,4 +214,4 @@ func (r *WaveReader) riffChunkParser() error {
 
 //func WavFormatReader(r io.Reader, n int64) io.Reader { return &WaveReader{r, n }}
 
-func (w WaveReader) Read(p []byte) (n int, err error) { return 0, nil }
+// func (w WaveReader) Read(p []byte) (n int, err error) { return 0, nil }
