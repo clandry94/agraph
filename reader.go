@@ -140,7 +140,7 @@ func NewWaveReader(fp *os.File) (*WaveReader, error) {
 	reader.in = bytes.NewReader(data)
 
 	/*
-		TODO: Need to fmt, list, and data chunks here
+		TODO: Need to parse fmt, and data chunks here
 	 */
 	 err = reader.riffChunkParser()
 	 if err != nil {
@@ -157,7 +157,7 @@ func NewWaveReader(fp *os.File) (*WaveReader, error) {
 /*
 	TODO: Clean these parsers up
  */
-func (r WaveReader) riffChunkParser() error {
+func (r *WaveReader) riffChunkParser() error {
 	chunkId := make([]byte, 4)
 
 	// Read the RIFF token from the
