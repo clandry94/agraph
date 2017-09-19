@@ -6,11 +6,11 @@ import (
 )
 
 type Graph struct {
-	Meta Meta
-	Codec    Codec
-	source   *[]byte
-	sink     *[]byte
-	root     *Node
+	Meta   Meta
+	Codec  Codec
+	source *[]byte
+	sink   *[]byte
+	root   *Node
 }
 
 type Meta struct {
@@ -35,18 +35,17 @@ func New(filepath string) (*Graph, error) {
 
 	fmt.Print(reader)
 
-
 	/*
-	codec := Mp3{
-		file: file,
-	}
+		codec := Mp3{
+			file: file,
+		}
 	*/
 
 	return &Graph{
-		Meta: meta,
-		Codec:    nil,
-		source:   nil,
-		sink:     nil,
-		root:     nil,
+		Meta:   meta,
+		Codec:  nil,
+		source: nil,
+		sink:   nil,
+		root:   nil,
 	}, nil
 }

@@ -1,12 +1,12 @@
 package agraph
 
 import (
-	"io"
-	"os"
-	"fmt"
-	"io/ioutil"
 	"bytes"
 	"encoding/binary"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
 )
 
 /*
@@ -64,11 +64,10 @@ const (
 
 // Riff Chunk
 type Riff struct {
-	ChunkID         []byte
-	ChunkSize       uint32
-	Format []byte
+	ChunkID   []byte
+	ChunkSize uint32
+	Format    []byte
 }
-
 
 // Fmt Chunk
 type Fmt struct {
@@ -112,26 +111,26 @@ type WaveReader struct {
 	Fmt  *Fmt
 	Data *Data
 
-	dataSource int64
+	dataSource  int64
 	SampleCount uint32
-	ReadSample int32
-	SampleTime int
+	ReadSample  int32
+	SampleTime  int
 }
 
 func NewWaveReader(fp *os.File) (*WaveReader, error) {
 	defer fp.Close()
 	fStat, err := fp.Stat()
 	if err != nil {
-		return &WaveReader{}, err
+		return nil, err
 	}
 
 	if fStat.Size() > maxFileSize {
-		return &WaveReader{}, fmt.Errorf("File size (%v bytes) is too large", fStat.Size())
+		return nil, fmt.Errorf("File size (%v bytes) is too large", fStat.Size())
 	}
 
 	data, err := ioutil.ReadAll(fp)
 	if err != nil {
-		return &WaveReader{}, err
+		return nil, err
 	}
 
 	fmt.Printf("File Size: %v\n", fStat.Size())
@@ -141,12 +140,11 @@ func NewWaveReader(fp *os.File) (*WaveReader, error) {
 
 	/*
 		TODO: Need to parse fmt, and data chunks here
-	 */
-	 err = reader.riffChunkParser()
-	 if err != nil {
-	 	return reader, err
-	 }
-
+	*/
+	err = reader.parseRiffChunk()
+	if err != nil {
+		return reader, err
+	}
 
 	//reader.SampleCount = reader.Data.Size / uint32(reader.Fmt.Data.BlockAlign)
 	//reader.SampleTime = int(reader.SampleCount / reader.Fmt.Data.SampleRate)
@@ -156,15 +154,15 @@ func NewWaveReader(fp *os.File) (*WaveReader, error) {
 
 /*
 	TODO: Clean these parsers up
- */
-func (r *WaveReader) riffChunkParser() error {
+*/
+func (r *WaveReader) parseRiffChunk() error {
 	chunkId := make([]byte, 4)
 
 	// Read the RIFF token from the
 	err := binary.Read(r.in, binary.BigEndian, chunkId)
 	fmt.Printf("Chunk ID in bytes: %v\n", chunkId)
 	fmt.Printf("Chunk ID as string: %v\n", string(chunkId))
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -188,7 +186,7 @@ func (r *WaveReader) riffChunkParser() error {
 	fmt.Printf("Chunk size as decimal %v\n", chunkSize)
 
 	if chunkSize != uint32(r.size)-8 {
-		return fmt.Errorf("RIFF Chunk Size %v must == file size-8 bytes %v", chunkSize, r.size-8 )
+		return fmt.Errorf("RIFF Chunk Size %v must == file size-8 bytes %v", chunkSize, r.size-8)
 	}
 
 	format := make([]byte, 4)
@@ -202,9 +200,9 @@ func (r *WaveReader) riffChunkParser() error {
 	}
 
 	riff := Riff{
-		ChunkID: chunkId,
+		ChunkID:   chunkId,
 		ChunkSize: chunkSize,
-		Format: format,
+		Format:    format,
 	}
 
 	r.Riff = &riff

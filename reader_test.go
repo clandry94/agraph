@@ -1,8 +1,8 @@
 package agraph
 
 import (
-"testing"
 	"os"
+	"testing"
 )
 
 func TestNewWaveReader(t *testing.T) {
@@ -17,7 +17,7 @@ func TestNewWaveReader(t *testing.T) {
 	}
 
 	expectedID := "RIFF"
-	expectedSize := uint32(160038)  // take off the 8 bits??
+	expectedSize := uint32(160038) // take off the 8 bits??
 	expectedFormat := "WAVE"
 
 	if string(reader.Riff.ChunkID) != expectedID {
@@ -31,4 +31,3 @@ func TestNewWaveReader(t *testing.T) {
 		t.Errorf("Actual format %v is not equal to expected formmat %v", expectedFormat, reader.Riff.Format)
 	}
 }
-
