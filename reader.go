@@ -22,7 +22,7 @@ const (
 
 	riffChunkToken = "RIFF"
 	wavFormatToken = "WAVE"
-	fmtChunkToken  = "fmt"
+	fmtChunkToken  = "fmt "
 	listChunkToken = "LIST"
 	dataChunkToken = "data"
 )
@@ -143,7 +143,12 @@ func NewWaveReader(fp *os.File) (*WaveReader, error) {
 	*/
 	err = reader.parseRiffChunk()
 	if err != nil {
-		return reader, err
+		return nil, err
+	}
+
+	err = reader.parseFmtChunk()
+	if err != nil {
+		return nil, err
 	}
 
 	//reader.SampleCount = reader.Data.Size / uint32(reader.Fmt.Data.BlockAlign)
@@ -209,6 +214,86 @@ func (r *WaveReader) parseRiffChunk() error {
 
 	return nil
 }
+
+func (r *WaveReader) parseFmtChunk() error {
+	subChunk1ID := make([]byte, 4)
+	err := binary.Read(r.in, binary.BigEndian, subChunk1ID)
+	if err != nil {
+		return err
+	}
+
+	if string(subChunk1ID) != fmtChunkToken {
+		return fmt.Errorf("File's fmt subchunk is wrong. Found token Id of %s", string(subChunk1ID))
+	}
+
+	subChunk1Bytes := make([]byte, 4)
+	err = binary.Read(r.in, binary.LittleEndian, subChunk1Bytes)
+	if err != nil {
+		return err
+	}
+	subChunk1Size := binary.LittleEndian.Uint32(subChunk1Bytes)
+	if subChunk1Size != fmtChunkSize {
+		return fmt.Errorf("Fmt Chunk Size %v must == %v", subChunk1ID, fmtChunkSize)
+	}
+
+	audioFormatByte := make([]byte, 2)
+	err = binary.Read(r.in, binary.LittleEndian, audioFormatByte)
+	if err != nil {
+		return err
+	}
+	audioFormat := binary.LittleEndian.Uint16(audioFormatByte)
+
+	numChannelsByte := make([]byte, 2)
+	err = binary.Read(r.in, binary.LittleEndian, numChannelsByte)
+	if err != nil {
+		return err
+	}
+	numChannels := binary.LittleEndian.Uint16(numChannelsByte)
+
+	sampleRateByte := make([]byte, 4)
+	err = binary.Read(r.in, binary.LittleEndian, sampleRateByte)
+	if err != nil {
+		return err
+	}
+	sampleRate := binary.LittleEndian.Uint32(sampleRateByte)
+
+	byteRateByte := make([]byte, 4)
+	err = binary.Read(r.in, binary.LittleEndian, byteRateByte)
+	if err != nil {
+		return err
+	}
+	byteRate := binary.LittleEndian.Uint32(byteRateByte)
+
+	blockAlignByte := make([]byte, 2)
+	err = binary.Read(r.in, binary.LittleEndian, blockAlignByte)
+	if err != nil {
+		return err
+	}
+	blockAlign := binary.LittleEndian.Uint16(blockAlignByte)
+
+	bitsPerSampleByte := make([]byte, 2)
+	err = binary.Read(r.in, binary.LittleEndian, bitsPerSampleByte)
+	if err != nil {
+		return err
+	}
+	bitsPerSample := binary.LittleEndian.Uint16(bitsPerSampleByte)
+
+	r.Fmt = &Fmt{
+		ID:   subChunk1ID,
+		Size: subChunk1Size,
+		Data: &WavFmtData {
+			AudioFormat: audioFormat,
+			NumChannels: numChannels,
+			SampleRate: sampleRate,
+			ByteRate: byteRate,
+			BlockAlign: blockAlign,
+			BitsPerSample: bitsPerSample,
+		},
+	}
+	
+	return nil
+}
+
 
 //func WavFormatReader(r io.Reader, n int64) io.Reader { return &WaveReader{r, n }}
 
