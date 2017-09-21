@@ -16,7 +16,7 @@ func TestNewWaveReader(t *testing.T) {
 		t.Error(err)
 	}
 
-	expectedID := "RIFF"
+	expectedChunkID := "RIFF"
 	expectedSize := uint32(160038) // take off the 8 bits??
 	expectedFormat := "WAVE"
 	expectedSubChunk1ID := "fmt "
@@ -27,9 +27,11 @@ func TestNewWaveReader(t *testing.T) {
 	expectedByteRate := uint32(16000)
 	expectedBlockAlign := uint16(2)
 	expectedBitsPerSamp := uint16(16)
+	expectedSubchunk2ID := "data"
+	expectedSubchunk2Size := uint32(160002)
 
-	if string(reader.Riff.ChunkID) != expectedID {
-		t.Errorf("Actual chunk ID %v is not equal to expected chunk ID %v", expectedID, reader.Riff.ChunkID)
+	if string(reader.Riff.ChunkID) != expectedChunkID {
+		t.Errorf("Actual chunk ID %v is not equal to expected chunk ID %v", expectedChunkID, reader.Riff.ChunkID)
 	}
 
 	if reader.Riff.ChunkSize != expectedSize {
@@ -70,4 +72,14 @@ func TestNewWaveReader(t *testing.T) {
 	if reader.Fmt.Data.BitsPerSample != expectedBitsPerSamp {
 		t.Errorf("Actual bits-per-sample %v is not equal to expected bits-per-sample %v", reader.Fmt.Data.BitsPerSample, expectedBitsPerSamp)
 	}
+
+	if string(reader.Data.ID) != expectedSubchunk2ID {
+		t.Errorf("Actual subchunk2ID %v is not equal to expected subchunk2ID %v", reader.Data.ID, expectedSubchunk2ID)
+	}
+
+	if reader.Data.Size != expectedSubchunk2Size {
+		t.Errorf("Actual subchunk2 size %v is not equal to expected size %v", reader.Data.Size, expectedSubChunk1Size)
+	}
+
+
 }
