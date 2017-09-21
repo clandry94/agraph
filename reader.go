@@ -135,9 +135,6 @@ func NewWaveReader(fp *os.File) (*WaveReader, error) {
 	reader.size = fStat.Size()
 	reader.in = bytes.NewReader(data)
 
-	/*
-		TODO: Need to parse fmt, and data chunks here
-	*/
 	err = reader.parseRiffChunk()
 	if err != nil {
 		return nil, err
@@ -153,8 +150,8 @@ func NewWaveReader(fp *os.File) (*WaveReader, error) {
 		return nil, err
 	}
 
-	//reader.SampleCount = reader.Data.Size / uint32(reader.Fmt.Data.BlockAlign)
-	//reader.SampleTime = int(reader.SampleCount / reader.Fmt.Data.SampleRate)
+	reader.SampleCount = reader.Data.Size / uint32(reader.Fmt.Data.BlockAlign)
+	reader.SampleTime = int(reader.SampleCount / reader.Fmt.Data.SampleRate)
 
 	return reader, nil
 }
@@ -338,7 +335,3 @@ func (r *WaveReader) parseDataChunk() error {
 
 	return nil
 }
-
-//func WavFormatReader(r io.Reader, n int64) io.Reader { return &WaveReader{r, n }}
-
-// func (w WaveReader) Read(p []byte) (n int, err error) { return 0, nil }
