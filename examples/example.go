@@ -3,15 +3,41 @@ package main
 import (
 	"fmt"
 	"github.com/clandry94/agraph"
+	"os"
+	"time"
 )
 
 func main() {
-	ar, err := agraph.New("ringbackA.wav")
+	_, err := agraph.New("ringbackA.wav")
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Println(ar.Meta)
+	file, err := os.OpenFile("ringbackA.wav", os.O_RDWR, 066)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	reader, err := agraph.NewWaveReader(file)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(reader)
+
+	start := time.Now()
+	for {
+		_, err := reader.ReadRawSample()
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+		//fmt.Printf(" %v ", data)
+	}
+	end := time.Now()
+	fmt.Println(end.Sub(start))
+
+
 
 	/*
 	firstNode, _ := agraph.NewNode(agraph.NopFilter)

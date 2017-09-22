@@ -1,7 +1,6 @@
 package agraph
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -19,7 +18,7 @@ type Meta struct {
 }
 
 func New(filepath string) (*Graph, error) {
-	file, err := os.OpenFile(filepath, os.O_RDWR, 0666)
+	_, err := os.OpenFile(filepath, os.O_RDWR, 0666)
 	if err != nil {
 		return nil, err
 	}
@@ -28,12 +27,14 @@ func New(filepath string) (*Graph, error) {
 		Filepath: filepath,
 	}
 
+	/*
 	reader, err := NewWaveReader(file)
 	if err != nil {
 		return &Graph{}, err
 	}
+	*/
 
-	fmt.Print(reader)
+
 
 	/*
 		codec := Mp3{
