@@ -14,8 +14,8 @@ import (
 */
 
 const (
-	maxFileSize             = 2 << 31
-	fmtChunkSize            = 16
+	maxFileSize  = 2 << 31
+	fmtChunkSize = 16
 
 	riffChunkToken = "RIFF"
 	wavFormatToken = "WAVE"
@@ -31,7 +31,7 @@ const (
 //		| ChunkSize     | 4
 //8		|---------------|
 //		| Format 		| 4
-//12	|---------------|
+//12	|---------------\
 //		| Subchunk1ID   | 4
 //16	|---------------|`
 //		| Subchunk1Size | 4
@@ -83,13 +83,15 @@ type WavFmtData struct {
 }
 
 // Data Chunk
-type Data struct {
+type data struct {
 	ID   []byte
 	Size uint32
-	Data []byte
+
+	// Holds the data of the wave file. Shouldn't be accessed directly since it has a reader
+	data DataReader
 }
 
-type Reader interface {
+type DataReader interface {
 	io.Reader
 	io.ReaderAt
 }
@@ -106,7 +108,7 @@ type WaveReader struct {
 
 	Riff *Riff
 	Fmt  *Fmt
-	Data *Data
+	data *data
 
 	dataSource  int64
 	SampleCount uint32
@@ -150,10 +152,35 @@ func NewWaveReader(fp *os.File) (*WaveReader, error) {
 		return nil, err
 	}
 
-	reader.SampleCount = reader.Data.Size / uint32(reader.Fmt.Data.BlockAlign)
+	reader.SampleCount = reader.data.Size / uint32(reader.Fmt.Data.BlockAlign)
 	reader.SampleTime = int(reader.SampleCount / reader.Fmt.Data.SampleRate)
 
 	return reader, nil
+}
+
+// Reads into a byte slice
+func (r *WaveReader) Read(b []byte) (int, error) {
+	return r.data.data.Read(b)
+}
+
+// Returns a byte slice the size of one sample
+func (r *WaveReader) ReadRawSample() ([]byte, error) {
+	size := r.Fmt.Data.BlockAlign
+	b := make([]byte, size)
+	n, err := r.Read(b)
+
+	if err == nil {
+		r.ReadSample += 1
+	} else {
+		return b, err
+	}
+
+	if uint16(n) != size {
+		return b, fmt.Errorf("sample read is not the "+
+			"same size as the sample size: %v != %v", n, size)
+	}
+
+	return b, err
 }
 
 /*
@@ -277,27 +304,19 @@ func (r *WaveReader) parseFmtChunk() error {
 	}
 	bitsPerSample := binary.LittleEndian.Uint16(bitsPerSampleByte)
 
-	fmt.Printf("AudioFormat: %v\n", audioFormat)
-	fmt.Printf("NumChannels: %v\n", numChannels)
-	fmt.Printf("SampleRate: %v\n", sampleRate)
-	fmt.Printf("ByteRate: %v\n", byteRate)
-	fmt.Printf("BlockAlign: %v\n", blockAlign)
-	fmt.Printf("BitsPerSample: %v\n", bitsPerSample)
-
-
 	r.Fmt = &Fmt{
 		ID:   subChunk1ID,
 		Size: subChunk1Size,
-		Data: &WavFmtData {
-			AudioFormat: audioFormat,
-			NumChannels: numChannels,
-			SampleRate: sampleRate,
-			ByteRate: byteRate,
-			BlockAlign: blockAlign,
+		Data: &WavFmtData{
+			AudioFormat:   audioFormat,
+			NumChannels:   numChannels,
+			SampleRate:    sampleRate,
+			ByteRate:      byteRate,
+			BlockAlign:    blockAlign,
 			BitsPerSample: bitsPerSample,
 		},
 	}
-	
+
 	return nil
 }
 
@@ -320,17 +339,19 @@ func (r *WaveReader) parseDataChunk() error {
 
 	subChunk2Size := binary.LittleEndian.Uint32(subChunk2Bytes)
 
-	data := make([]byte, subChunk2Size)
+	b := make([]byte, subChunk2Size)
 
-	err = binary.Read(r.in, binary.LittleEndian, data)
+	err = binary.Read(r.in, binary.LittleEndian, b)
 	if err != nil {
 		return err
 	}
 
-	r.Data = &Data{
-		ID: subChunk2ID,
+	dataReader := bytes.NewReader(b)
+
+	r.data = &data{
+		ID:   subChunk2ID,
 		Size: subChunk2Size,
-		Data: data,
+		data: dataReader,
 	}
 
 	return nil

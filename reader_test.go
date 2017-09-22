@@ -1,6 +1,7 @@
 package agraph
 
 import (
+	"fmt"
 	"os"
 	"testing"
 )
@@ -73,13 +74,61 @@ func TestNewWaveReader(t *testing.T) {
 		t.Errorf("Actual bits-per-sample %v is not equal to expected bits-per-sample %v", reader.Fmt.Data.BitsPerSample, expectedBitsPerSamp)
 	}
 
-	if string(reader.Data.ID) != expectedSubchunk2ID {
-		t.Errorf("Actual subchunk2ID %v is not equal to expected subchunk2ID %v", reader.Data.ID, expectedSubchunk2ID)
+	if string(reader.data.ID) != expectedSubchunk2ID {
+		t.Errorf("Actual subchunk2ID %v is not equal to expected subchunk2ID %v", reader.data.ID, expectedSubchunk2ID)
 	}
 
-	if reader.Data.Size != expectedSubchunk2Size {
-		t.Errorf("Actual subchunk2 size %v is not equal to expected size %v", reader.Data.Size, expectedSubChunk1Size)
+	if reader.data.Size != expectedSubchunk2Size {
+		t.Errorf("Actual subchunk2 size %v is not equal to expected size %v", reader.data.Size, expectedSubChunk1Size)
 	}
 
+	fmt.Printf("AudioFormat: %v\n", reader.Fmt.Data.AudioFormat)
+	fmt.Printf("NumChannels: %v\n", reader.Fmt.Data.NumChannels)
+	fmt.Printf("SampleRate: %v\n", reader.Fmt.Data.SampleRate)
+	fmt.Printf("ByteRate: %v\n", reader.Fmt.Data.ByteRate)
+	fmt.Printf("BlockAlign: %v\n", reader.Fmt.Data.BlockAlign)
+	fmt.Printf("BitsPerSample: %v\n", reader.Fmt.Data.BitsPerSample)
+}
+
+func TestRead(t *testing.T) {
+	file, err := os.OpenFile("examples/ringbackA.wav", os.O_RDWR, 066)
+	if err != nil {
+		t.Error(err)
+	}
+
+	reader, err := NewWaveReader(file)
+	if err != nil {
+		t.Error(err)
+	}
+
+	expectedSize := 1024
+
+	b := make([]byte, expectedSize)
+	actualSize, err := reader.Read(b)
+	if err != nil {
+		t.Error(err)
+	}
+
+	fmt.Println(b)
+	if actualSize != expectedSize {
+		t.Errorf("Actual size %v != expected size %v", actualSize, expectedSize)
+	}
+}
+
+func TestReadRawSample(t *testing.T) {
+	file, err := os.OpenFile("examples/ringbackA.wav", os.O_RDWR, 066)
+	if err != nil {
+		t.Error(err)
+	}
+
+	reader, err := NewWaveReader(file)
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, err = reader.ReadRawSample()
+	if err != nil {
+		t.Error(err)
+	}
 
 }
