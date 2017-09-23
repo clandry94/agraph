@@ -91,7 +91,7 @@ func TestNewWaveReader(t *testing.T) {
 }
 
 func TestRead(t *testing.T) {
-	file, err := os.OpenFile("examples/ringbackA.wav", os.O_RDWR, 066)
+	file, err := os.OpenFile("examples/tone.wav", os.O_RDWR, 066)
 	if err != nil {
 		t.Error(err)
 	}
@@ -109,13 +109,12 @@ func TestRead(t *testing.T) {
 		t.Error(err)
 	}
 
-	fmt.Println(b)
 	if actualSize != expectedSize {
 		t.Errorf("Actual size %v != expected size %v", actualSize, expectedSize)
 	}
 }
 
-func TestReadRawSample(t *testing.T) {
+func TestReadSampleRaw(t *testing.T) {
 	file, err := os.OpenFile("examples/ringbackA.wav", os.O_RDWR, 066)
 	if err != nil {
 		t.Error(err)
@@ -126,9 +125,27 @@ func TestReadRawSample(t *testing.T) {
 		t.Error(err)
 	}
 
-	_, err = reader.ReadRawSample()
+	_, err = reader.ReadSampleRaw()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestReadSampleFloat(t *testing.T) {
+	file, err := os.OpenFile("examples/ringbackA.wav", os.O_RDWR, 066)
 	if err != nil {
 		t.Error(err)
 	}
 
+	reader, err := NewWaveReader(file)
+	if err != nil {
+		t.Error(err)
+	}
+
+	samp, err := reader.ReadSampleFloat()
+	if err != nil {
+		t.Error(err)
+	}
+
+	fmt.Println(samp)
 }

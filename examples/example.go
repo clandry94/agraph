@@ -13,7 +13,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	file, err := os.OpenFile("ringbackA.wav", os.O_RDWR, 066)
+	file, err := os.OpenFile("long_sample.wav", os.O_RDWR, 066)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -27,7 +27,7 @@ func main() {
 
 	start := time.Now()
 	for {
-		_, err := reader.ReadRawSample()
+		_, err := reader.ReadSampleFloat()
 		if err != nil {
 			fmt.Println(err)
 			break
@@ -37,14 +37,12 @@ func main() {
 	end := time.Now()
 	fmt.Println(end.Sub(start))
 
-
-
 	/*
-	firstNode, _ := agraph.NewNode(agraph.NopFilter)
-	secondNode, _ := agraph.NewNode(agraph.VolumeFilter)
-	thirdNode, _ := agraph.NewNode(agraph.NopFilter)
+		firstNode, _ := agraph.NewNode(agraph.NopFilter)
+		secondNode, _ := agraph.NewNode(agraph.VolumeFilter)
+		thirdNode, _ := agraph.NewNode(agraph.NopFilter)
 
-	firstNode.SetSink(secondNode.Source())
-	secondNode.SetSink(thirdNode.Source())
+		firstNode.SetSink(secondNode.Source())
+		secondNode.SetSink(thirdNode.Source())
 	*/
 }

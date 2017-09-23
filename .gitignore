@@ -1,5 +1,8 @@
 .DS_STORE
 
+# Ignore the big wav file
+long_sample.wav
+
 # Binaries for programs and plugins
 *.exe
 *.dll

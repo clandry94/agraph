@@ -112,7 +112,7 @@ type WaveReader struct {
 
 	dataSource  int64
 	SampleCount uint32
-	ReadSample  int32
+	SampleNum  int32
 	SampleTime  int
 }
 
@@ -164,13 +164,13 @@ func (r *WaveReader) Read(b []byte) (int, error) {
 }
 
 // Returns a byte slice the size of one sample
-func (r *WaveReader) ReadRawSample() ([]byte, error) {
+func (r *WaveReader) ReadSampleRaw() ([]byte, error) {
 	size := r.Fmt.Data.BlockAlign
 	b := make([]byte, size)
 	n, err := r.Read(b)
 
 	if err == nil {
-		r.ReadSample += 1
+		r.SampleNum += 1
 	} else {
 		return b, err
 	}
@@ -183,6 +183,47 @@ func (r *WaveReader) ReadRawSample() ([]byte, error) {
 	return b, err
 }
 
+func (r *WaveReader) ReadSampleFloat() ([]float64, error) {
+	rawSample, err := r.ReadSampleRaw()
+	if err != nil {
+		return nil, err
+	}
+
+	numChannels := int(r.Fmt.Data.NumChannels)
+	// Make a float64 array that holds a sample for each channel.
+	// Not sure if this will work for anything besides mono or stereo
+	sample := make([]float64, numChannels)
+
+	// samples are stored interleaved so divide the length of each sample
+	// by the number of channels to get the *actual* length of a sample
+	// numChannels > 2 is still undocumented officially
+	// https://msdn.microsoft.com/en-us/library/windows/hardware/dn653308(v=vs.85).aspx
+	length := len(rawSample) / numChannels
+
+	// binary.BigEndian.
+
+	for i := 0; i < numChannels; i++ {
+		lowerBound := length * i
+		upperBound := length * (i + 1)
+		intBytes := toInt(rawSample[lowerBound : upperBound])
+
+		switch r.Fmt.Data.BitsPerSample {
+		case 8:
+			sample[i] = float64(intBytes - 128) / 128.0
+		case 16:
+			sample[i] = float64(intBytes) / 32768.0
+		}
+	}
+
+
+	return sample, nil
+}
+
+
+func toInt(b []byte) int {
+	// may need to handle different length samples
+	return int(b[0])
+}
 /*
 	TODO: Clean these parsers up
 */
