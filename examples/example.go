@@ -13,7 +13,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	file, err := os.OpenFile("long_sample.wav", os.O_RDWR, 066)
+	file, err := os.OpenFile("tone.wav", os.O_RDWR, 066)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -22,27 +22,43 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	fmt.Println(reader)
 
+	firstNode, _ := agraph.NewNode(agraph.NopFilter, "nop1")
+	secondNode, _ := agraph.NewNode(agraph.NopFilter, "nop2")
+
+	firstNode.SetSink(secondNode.Source())
+	secondNode.SetSink(make(chan []float64, agraph.SOURCE_SIZE))
+
+	fmt.Println(firstNode.Source())
+	fmt.Println(firstNode.Sink())
+	fmt.Println(secondNode.Source())
+	fmt.Println(secondNode.Sink())
+
+	go firstNode.Process()
+	go secondNode.Process()
+
 	start := time.Now()
+
 	for {
-		_, err := reader.ReadSampleFloat()
+		data, err := reader.ReadSampleFloat()
 		if err != nil {
 			fmt.Println(err)
 			break
 		}
+
+		firstNode.Source() <- data
+
+		//_ = <-secondNode.Sink()
+		filtered := <-secondNode.Sink()
+
+		fmt.Println(filtered)
 		//fmt.Printf(" %v ", data)
 	}
+
 	end := time.Now()
 	fmt.Println(end.Sub(start))
 
-	/*
-		firstNode, _ := agraph.NewNode(agraph.NopFilter)
-		secondNode, _ := agraph.NewNode(agraph.VolumeFilter)
-		thirdNode, _ := agraph.NewNode(agraph.NopFilter)
 
-		firstNode.SetSink(secondNode.Source())
-		secondNode.SetSink(thirdNode.Source())
-	*/
+
 }

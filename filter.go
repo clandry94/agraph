@@ -32,18 +32,19 @@ const (
 //	secondNode.Sink = thirdNode.Source
 type Node interface {
 	Process() error
-	do(data []byte) ([]byte, error)
-	SetSink(c chan []byte)
-	Source() chan []byte
+	do(data []float64) ([]float64, error)
+	SetSink(c chan []float64)
+	Source() chan []float64
+	Sink() chan []float64
 }
 
-func NewNode(t FilterType) (Node, error) {
+func NewNode(t FilterType, name string) (Node, error) {
 	switch t {
 	case NopFilter:
-		return newNop()
+		return newNop(name)
 	case VolumeFilter:
-		return newVolume(3) // increase multipler
+		return newVolume(3) // increase multiplier
 	default:
-		return newNop()
+		return newNop("default")
 	}
 }
