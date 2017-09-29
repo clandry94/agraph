@@ -13,7 +13,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	file, err := os.OpenFile("tone.wav", os.O_RDWR, 066)
+	file, err := os.OpenFile("long_sample.wav", os.O_RDWR, 066)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -50,9 +50,9 @@ func main() {
 		firstNode.Source() <- data
 
 		//_ = <-secondNode.Sink()
-		filtered := <-secondNode.Sink()
+		_ = <-secondNode.Sink()
 
-		fmt.Println(filtered)
+		//fmt.Println(filtered)
 		//fmt.Printf(" %v ", data)
 	}
 

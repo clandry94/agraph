@@ -5,7 +5,7 @@ import (
 )
 
 func TestNopFilterCreation(t *testing.T) {
-	_, err := NewNode(NopFilter)
+	_, err := NewNode(NopFilter, "test1")
 	if err != nil {
 		t.Error(err)
 	}

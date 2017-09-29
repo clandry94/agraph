@@ -6,14 +6,14 @@ package agraph
 type Nop struct {
 	source chan []float64
 	sink   chan []float64
-	Name string
+	Name   string
 }
 
 func newNop(name string) (Node, error) {
 	return &Nop{
 		source: make(chan []float64, SOURCE_SIZE),
 		sink:   nil,
-		Name: name,
+		Name:   name,
 	}, nil
 }
 

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 )
@@ -12,96 +11,6 @@ import (
 /*
 	Implementatiton specific to WAVE
 */
-
-const (
-	maxFileSize  = 2 << 31
-	fmtChunkSize = 16
-
-	riffChunkToken = "RIFF"
-	wavFormatToken = "WAVE"
-	fmtChunkToken  = "fmt "
-	// listChunkToken = "LIST"
-	dataChunkToken = "data"
-)
-
-// WAVE File Format
-//0		 ---------------
-//		| ChunkID       | 4 bytes
-//4		|---------------|
-//		| ChunkSize     | 4
-//8		|---------------|
-//		| Format 		| 4
-//12	|---------------\
-//		| Subchunk1ID   | 4
-//16	|---------------|`
-//		| Subchunk1Size | 4
-//20	|---------------|
-//		| AudioFormat   | 2
-//22	|---------------|
-//		| NumChannels   | 2
-//24	|---------------|
-//		| SampleRate    | 4
-//28	|---------------|
-//		| ByteRate      | 4
-//32	|---------------|
-//		| BlockAlign    | 2
-//34	|---------------|
-//		| BitsPerSample | 2
-//36	|---------------|
-//		| Subchunk2ID   | 4
-//40	|---------------|
-//		| Subchunk2Size | 4
-//44	|---------------|
-//		|				|
-//		|				|
-//		|     data		| Subchunk2Size
-//		|		        |
-//		|               |
-//		 ---------------
-
-// Riff Chunk
-type Riff struct {
-	ChunkID   []byte
-	ChunkSize uint32
-	Format    []byte
-}
-
-// Fmt Chunk
-type Fmt struct {
-	ID   []byte
-	Size uint32
-	Data *WavFmtData
-}
-
-type WavFmtData struct {
-	AudioFormat   uint16
-	NumChannels   uint16
-	SampleRate    uint32 /// per second
-	ByteRate      uint32
-	BlockAlign    uint16 // data block size in bytes aka numChannels * BitsPerSample /8
-	BitsPerSample uint16
-}
-
-// Data Chunk
-type data struct {
-	ID   []byte
-	Size uint32
-
-	// Holds the data of the wave file. Shouldn't be accessed directly since it has a reader
-	data DataReader
-}
-
-type DataReader interface {
-	io.Reader
-	io.ReaderAt
-}
-
-type ReadSeeker interface {
-	io.Reader
-	io.Seeker
-	io.ReaderAt
-}
-
 type WaveReader struct {
 	in   ReadSeeker
 	size int64
@@ -112,7 +21,7 @@ type WaveReader struct {
 
 	dataSource  int64
 	SampleCount uint32
-	SampleNum  int32
+	SampleNum   int32
 	SampleTime  int
 }
 
@@ -205,25 +114,24 @@ func (r *WaveReader) ReadSampleFloat() ([]float64, error) {
 	for i := 0; i < numChannels; i++ {
 		lowerBound := length * i
 		upperBound := length * (i + 1)
-		intBytes := toInt(rawSample[lowerBound : upperBound])
+		intBytes := toInt(rawSample[lowerBound:upperBound])
 
 		switch r.Fmt.Data.BitsPerSample {
 		case 8:
-			sample[i] = float64(intBytes - 128) / 128.0
+			sample[i] = float64(intBytes-128) / 128.0
 		case 16:
 			sample[i] = float64(intBytes) / 32768.0
 		}
 	}
 
-
 	return sample, nil
 }
-
 
 func toInt(b []byte) int {
 	// may need to handle different length samples
 	return int(b[0])
 }
+
 /*
 	TODO: Clean these parsers up
 */

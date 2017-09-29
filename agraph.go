@@ -28,13 +28,11 @@ func New(filepath string) (*Graph, error) {
 	}
 
 	/*
-	reader, err := NewWaveReader(file)
-	if err != nil {
-		return &Graph{}, err
-	}
+		reader, err := NewWaveReader(file)
+		if err != nil {
+			return &Graph{}, err
+		}
 	*/
-
-
 
 	/*
 		codec := Mp3{
