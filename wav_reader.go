@@ -9,7 +9,7 @@ import (
 )
 
 /*
-	Implementatiton specific to WAVE
+	Implementation specific to WAVE
 */
 type WaveReader struct {
 	in   ReadSeeker

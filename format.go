@@ -1,6 +1,7 @@
 package agraph
 
 import (
+	"bytes"
 	"io"
 )
 
@@ -93,4 +94,8 @@ type ReadSeeker interface {
 	io.ReaderAt
 }
 
-
+type DataWriterChunk struct {
+	ID   []byte
+	Size uint32
+	Data *bytes.Buffer
+}
