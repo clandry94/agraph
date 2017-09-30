@@ -128,13 +128,16 @@ func (r *WaveReader) ReadSampleFloat() ([]float64, error) {
 }
 
 func toInt(b []byte) int {
-	// may need to handle different length samples
-	return int(b[0])
+	switch len(b) {
+	case 1: // 8 bits
+		return int(b[0])
+	case 2: // 16 bits
+		return int(b[0]) + (int(b[1]) << 8)
+	default:
+		return 0
+	}
 }
 
-/*
-	TODO: Clean these parsers up
-*/
 func (r *WaveReader) parseRiffChunk() error {
 	chunkId := make([]byte, 4)
 

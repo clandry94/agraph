@@ -12,7 +12,7 @@ const (
 	riffChunkToken = "RIFF"
 	wavFormatToken = "WAVE"
 	fmtChunkToken  = "fmt "
-	// listChunkToken = "LIST"
+	// listChunkToken = "LIST" ????
 	dataChunkToken = "data"
 )
 

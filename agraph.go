@@ -6,7 +6,6 @@ import (
 
 type Graph struct {
 	Meta   Meta
-	Codec  Codec
 	source *[]float64
 	sink   *[]float64
 	root   *Node
@@ -42,7 +41,6 @@ func New(filepath string) (*Graph, error) {
 
 	return &Graph{
 		Meta:   meta,
-		Codec:  nil,
 		source: nil,
 		sink:   nil,
 		root:   nil,
