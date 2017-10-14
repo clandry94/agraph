@@ -92,7 +92,7 @@ func (r *WaveReader) ReadSampleRaw() ([]byte, error) {
 	return b, err
 }
 
-func (r *WaveReader) ReadSampleFloat() ([]float64, error) {
+func (r *WaveReader) ReadSampleFloat64() ([]float64, error) {
 	rawSample, err := r.ReadSampleRaw()
 	if err != nil {
 		return nil, err
@@ -125,6 +125,19 @@ func (r *WaveReader) ReadSampleFloat() ([]float64, error) {
 	}
 
 	return sample, nil
+}
+
+func (r *WaveReader) ReadSampleFloat32() ([]float32, error) {
+	out := make([]float32, r.Fmt.Data.NumChannels)
+	for i := 0; i < int(r.Fmt.Data.NumChannels); i++ {
+		s, err := r.ReadSampleFloat64()
+		if err != nil {
+			return nil, err
+		}
+		out[i] = float32(s[i])
+	}
+
+	return out, nil
 }
 
 func toInt(b []byte) int {
