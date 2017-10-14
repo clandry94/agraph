@@ -8,7 +8,7 @@ import "fmt"
 type Volume struct {
 	source     chan []float64
 	sink       chan []float64
-	Multiplier int
+	Multiplier int // something such as 1.2, 0.3, etc
 }
 
 func newVolume(multiplier int) (Node, error) {
