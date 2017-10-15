@@ -1,43 +1,45 @@
 package agraph
 
-import "fmt"
+import (
+	"fmt"
+)
 
 /*
 	Changes volume amount
 */
 type Volume struct {
-	source     chan []float64
-	sink       chan []float64
-	Multiplier int // something such as 1.2, 0.3, etc
+	source     chan []uint16
+	sink       chan []uint16
+	Multiplier float32 // something such as 1.2, 0.3, etc
 }
 
-func newVolume(multiplier int) (Node, error) {
+func newVolume(multiplier float32) (Node, error) {
 	return &Volume{
-		source:     make(chan []float64, SOURCE_SIZE),
+		source:     make(chan []uint16, SOURCE_SIZE),
 		sink:       nil,
 		Multiplier: multiplier,
 	}, nil
 }
 
-func (n *Volume) SetSink(c chan []float64) {
+func (n *Volume) SetSink(c chan []uint16) {
 	n.sink = c
 }
 
-func (n *Volume) Source() chan []float64 {
+func (n *Volume) Source() chan []uint16 {
 	return n.source
 }
 
-func (n *Volume) Sink() chan []float64 {
-	return n.source
+func (n *Volume) Sink() chan []uint16 {
+	return n.sink
 }
 
 func (n *Volume) Process() error {
+	fmt.Println("Starting up!")
+
 	for {
 		select {
 		case data := <-n.source:
-			fmt.Println("found data")
-			var filteredData, err = n.do(data)
-
+			filteredData, err := n.do(data)
 			if err != nil {
 				panic("Could not filter!")
 			}
@@ -47,6 +49,9 @@ func (n *Volume) Process() error {
 	return nil
 }
 
-func (n *Volume) do(data []float64) ([]float64, error) {
+func (n *Volume) do(data []uint16) ([]uint16, error) {
+	sample := data[0]
+	sample = sample + 1000
+	data[0] = sample
 	return data, nil
 }

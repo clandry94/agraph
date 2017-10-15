@@ -4,28 +4,28 @@ package agraph
 	Null operation filter. Does nothing.
 */
 type Nop struct {
-	source chan []float64
-	sink   chan []float64
+	source chan []uint16
+	sink   chan []uint16
 	Name   string
 }
 
 func newNop(name string) (Node, error) {
 	return &Nop{
-		source: make(chan []float64, SOURCE_SIZE),
+		source: make(chan []uint16, SOURCE_SIZE),
 		sink:   nil,
 		Name:   name,
 	}, nil
 }
 
-func (n *Nop) SetSink(c chan []float64) {
+func (n *Nop) SetSink(c chan []uint16) {
 	n.sink = c
 }
 
-func (n *Nop) Source() chan []float64 {
+func (n *Nop) Source() chan []uint16 {
 	return n.source
 }
 
-func (n *Nop) Sink() chan []float64 {
+func (n *Nop) Sink() chan []uint16 {
 	return n.sink
 }
 
@@ -44,6 +44,6 @@ func (n *Nop) Process() error {
 	return nil
 }
 
-func (n *Nop) do(data []float64) ([]float64, error) {
+func (n *Nop) do(data []uint16) ([]uint16, error) {
 	return data, nil
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"io"
 )
 
 /*
@@ -92,63 +93,44 @@ func (r *WaveReader) ReadSampleRaw() ([]byte, error) {
 	return b, err
 }
 
-func (r *WaveReader) ReadSampleFloat64() ([]float64, error) {
+func (r *WaveReader) ReadSampleInt16() ([]uint16, error) {
 	rawSample, err := r.ReadSampleRaw()
 	if err != nil {
 		return nil, err
 	}
 
-	numChannels := int(r.Fmt.Data.NumChannels)
-	// Make a float64 array that holds a sample for each channel.
-	// Not sure if this will work for anything besides mono or stereo
-	sample := make([]float64, numChannels)
+	sample := make([]uint16, int(r.Fmt.Data.NumChannels))
+	length := len(rawSample) / int(r.Fmt.Data.NumChannels)
 
-	// samples are stored interleaved so divide the length of each sample
-	// by the number of channels to get the *actual* length of a sample
-	// numChannels > 2 is still undocumented officially
-	// https://msdn.microsoft.com/en-us/library/windows/hardware/dn653308(v=vs.85).aspx
-	length := len(rawSample) / numChannels
-
-	// binary.BigEndian.
-
-	for i := 0; i < numChannels; i++ {
-		lowerBound := length * i
-		upperBound := length * (i + 1)
-		intBytes := toInt(rawSample[lowerBound:upperBound])
-
-		switch r.Fmt.Data.BitsPerSample {
-		case 8:
-			sample[i] = float64(intBytes-128) / 128.0
-		case 16:
-			sample[i] = float64(intBytes) / 32768.0
+	for i := 0; i < int(r.Fmt.Data.NumChannels); i++ {
+		sample[i] = bytesToInt(rawSample[length * i : length * (i + 1)])
+		if err != nil && err != io.EOF {
+			return sample, err
 		}
 	}
 
 	return sample, nil
 }
 
-func (r *WaveReader) ReadSampleFloat32() ([]float32, error) {
-	out := make([]float32, r.Fmt.Data.NumChannels)
-	for i := 0; i < int(r.Fmt.Data.NumChannels); i++ {
-		s, err := r.ReadSampleFloat64()
-		if err != nil {
-			return nil, err
-		}
-		out[i] = float32(s[i])
-	}
 
-	return out, nil
-}
-
-func toInt(b []byte) int {
+func bytesToInt(b []byte) uint16 {
+	var ret uint16
 	switch len(b) {
-	case 1: // 8 bits
-		return int(b[0])
-	case 2: // 16 bits
-		return int(b[0]) + (int(b[1]) << 8)
+	case 1:
+		// 0 ~ 128 ~ 255
+		ret = uint16(b[0])
+	case 2:
+		// -32768 ~ 0 ~ 32767
+		ret = uint16(b[0]) + uint16(b[1])<<8
+		//	fmt.Printf("%08b %08b ", b[1], b[0])
+		//	fmt.Printf("%016b => %d\n", ret, ret)
+	case 3:
+		// HiReso / DVDAudio
+		ret = uint16(b[0]) + uint16(b[1])<<8 + uint16(b[2])<<16
 	default:
-		return 0
+		ret = 0
 	}
+	return ret
 }
 
 func (r *WaveReader) parseRiffChunk() error {

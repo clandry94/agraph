@@ -4,8 +4,9 @@ type FilterType int
 
 const (
 	// Filters
-	NopFilter    FilterType = 1
+	NopFilter    FilterType = iota
 	VolumeFilter FilterType = 2
+	DelayFilter FilterType = 3
 
 	SOURCE_SIZE = 512
 )
@@ -32,18 +33,56 @@ const (
 //	secondNode.Sink = thirdNode.Source
 type Node interface {
 	Process() error
-	do(data []float64) ([]float64, error)
-	SetSink(c chan []float64)
-	Source() chan []float64
-	Sink() chan []float64
+	do(data []uint16) ([]uint16, error)
+	SetSink(c chan []uint16)
+	Source() chan []uint16
+	Sink() chan []uint16
 }
 
-func NewNode(t FilterType, name string) (Node, error) {
+type NodeInitOptions struct {
+	VolumeMultiplier float32
+	Delay int
+	Decay float32
+}
+
+type NodeInitOption func(*NodeInitOptions)
+
+func VolumeMultiplier(m float32) NodeInitOption {
+	return func(args *NodeInitOptions) {
+		args.VolumeMultiplier = m
+	}
+}
+
+// delay in milliseconds
+func Delay(m int) NodeInitOption{
+	return func(args *NodeInitOptions) {
+		args.Delay = m
+	}
+}
+
+func Decay(m float32) NodeInitOption {
+	return func(args *NodeInitOptions) {
+		args.Decay = m
+	}
+}
+
+func NewNode(t FilterType, name string, options ...NodeInitOption) (Node, error) {
+	args := &NodeInitOptions{
+		VolumeMultiplier: 0,
+		Delay: 0,
+	}
+
+	for _, option := range options {
+		option(args)
+	}
+
 	switch t {
 	case NopFilter:
 		return newNop(name)
 	case VolumeFilter:
-		return newVolume(3) // increase multiplier
+		return newVolume(args.VolumeMultiplier) // increase multiplier
+	case DelayFilter:
+		return newReverb(args.Delay, args.Decay)
 	default:
 		return newNop("default")
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	file, err := os.OpenFile("ringbackA.wav", os.O_RDWR, 066)
+	file, err := os.OpenFile("imperial_march.wav", os.O_RDWR, 066)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -19,7 +19,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	f, err := os.Create("volume_increase.wav")
+	f, err := os.Create("decay.wav")
 	defer f.Close()
 	if err != nil {
 		fmt.Println(err)
@@ -30,13 +30,14 @@ func main() {
 		agraph.SampleRate(int(reader.Fmt.Data.SampleRate)),
 		agraph.BitsPerSample(int(reader.Fmt.Data.BitsPerSample)))
 
-	volumeNode, _ := agraph.NewNode(agraph.VolumeFilter,
+	reverbNode, _ := agraph.NewNode(agraph.DelayFilter,
 		"volume1",
-		agraph.VolumeMultiplier(0.5))
+		agraph.Delay(30000),
+		agraph.Decay(1.0))
 
-	volumeNode.SetSink(make(chan []uint16, 0))
+	reverbNode.SetSink(make(chan []uint16, 0))
 
-	go volumeNode.Process()
+	go reverbNode.Process()
 	start := time.Now()
 
 	for {
@@ -47,8 +48,8 @@ func main() {
 		}
 
 		fmt.Printf("%v --> ", data)
-		volumeNode.Source() <- data
-		modifiedData := <-volumeNode.Sink()
+		reverbNode.Source() <- data
+		modifiedData := <-reverbNode.Sink()
 
 		fmt.Printf("%v\n", modifiedData)
 
