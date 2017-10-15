@@ -1,11 +1,11 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"github.com/clandry94/agraph"
 	"os"
 	"time"
-	"reflect"
 )
 
 func main() {
@@ -30,17 +30,16 @@ func main() {
 		fmt.Println(err)
 	}
 
-	//writer, err := agraph.NewWaveWriter(f,
-	//	agraph.NumChannels(int(reader.Fmt.Data.NumChannels)),
-	//	agraph.SampleRate(int(reader.Fmt.Data.SampleRate)),
-	//	agraph.BitsPerSample(int(reader.Fmt.Data.BitsPerSample)))
-
+	writer, err := agraph.NewWaveWriter(f,
+		agraph.NumChannels(int(reader.Fmt.Data.NumChannels)),
+		agraph.SampleRate(int(reader.Fmt.Data.SampleRate)),
+		agraph.BitsPerSample(int(reader.Fmt.Data.BitsPerSample)))
 
 	firstNode, _ := agraph.NewNode(agraph.NopFilter, "nop1")
 	secondNode, _ := agraph.NewNode(agraph.NopFilter, "nop2")
 
 	firstNode.SetSink(secondNode.Source())
-	secondNode.SetSink(make(chan []float64, agraph.SOURCE_SIZE))
+	secondNode.SetSink(make(chan []uint16, agraph.SOURCE_SIZE))
 
 	go firstNode.Process()
 	go secondNode.Process()
@@ -48,12 +47,18 @@ func main() {
 	start := time.Now()
 
 	for {
-		data, err := reader.ReadSampleFloat64()
+		data, err := reader.ReadSampleInt16()
 		if err != nil {
 			fmt.Println(err)
 			break
 		}
 		fmt.Println(data)
+
+		modifiedAudio := make([]byte, 2)
+
+		binary.LittleEndian.PutUint16(modifiedAudio, uint16(data[0]))
+
+		//binary.LittleEndian.PutUint16(modifiedAudio, uint16(data[1]))
 
 		//firstNode.Source() <- data
 
@@ -63,10 +68,10 @@ func main() {
 		//fmt.Println(filtered)
 		//fmt.Printf(" %v ", data)
 
-		//writer.Write(data)
+		writer.Write(modifiedAudio)
 	}
 
-	//writer.Close()
+	writer.Close()
 
 	end := time.Now()
 	fmt.Println(end.Sub(start))
