@@ -77,7 +77,7 @@ func NewNode(t FilterType, name string, options ...NodeInitOption) (Node, error)
 	case VolumeFilter:
 		return newVolume(args.VolumeMultiplier) // increase multiplier
 	case DelayFilter:
-		return newReverb(args.Delay, args.Decay)
+		return newDelay(args.Delay, args.Decay)
 	default:
 		return newNop("default")
 	}

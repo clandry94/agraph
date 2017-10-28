@@ -1,8 +1,5 @@
 package agraph
 
-import (
-	"fmt"
-)
 
 /*
 	Changes volume amount
@@ -17,7 +14,7 @@ type Delay struct {
 	delayBuffer []float32
 }
 
-func newReverb(delay int, decay float32) (Node, error) {
+func newDelay(delay int, decay float32) (Node, error) {
 	return &Delay{
 		source:      make(chan []uint16, SOURCE_SIZE),
 		sink:        nil,
@@ -45,7 +42,6 @@ func (n *Delay) Process() error {
 		select {
 		case data := <-n.source:
 			sample := data[0]
-			fmt.Println(n.i)
 			if n.i < 0 {
 				n.i += n.Delay
 			}
