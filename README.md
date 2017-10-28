@@ -41,9 +41,12 @@ for {
 ```
 
 # Todo
-- wave file writing
-- convolution filter
-- volume filter
+- ~wave file reading~
+- ~wave file writing~
+- Convolution filter
+- ~Delay Filter~
+- Finite Impulse Response filter
+- ~volume filter~ (was the first filter, so is technically not correct in many ways)
 - leaky integrator filter
 - FFT
 - some frequency domain filters
