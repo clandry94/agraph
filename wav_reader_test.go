@@ -131,7 +131,7 @@ func TestReadSampleRaw(t *testing.T) {
 	}
 }
 
-func TestReadSampleFloat(t *testing.T) {
+func TestWaveReaderReadSampleInt16(t *testing.T) {
 	file, err := os.OpenFile("examples/ringbackA.wav", os.O_RDWR, 066)
 	if err != nil {
 		t.Error(err)
@@ -142,7 +142,7 @@ func TestReadSampleFloat(t *testing.T) {
 		t.Error(err)
 	}
 
-	samp, err := reader.ReadSampleFloat()
+	samp, err := reader.ReadSampleInt16()
 	if err != nil {
 		t.Error(err)
 	}

@@ -1,8 +1,5 @@
 package agraph
 
-import (
-	"fmt"
-)
 
 /*
 	Changes volume amount
@@ -45,7 +42,6 @@ func (n *Delay) Process() error {
 		select {
 		case data := <-n.source:
 			sample := data[0]
-			fmt.Println(n.i)
 			if n.i < 0 {
 				n.i += n.Delay
 			}

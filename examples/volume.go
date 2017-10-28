@@ -48,7 +48,7 @@ func main() {
 
 		volumeNode.Source() <- data
 		modifiedData := <-volumeNode.Sink()
-		
+
 		modifiedDataAsBytes := make([]byte, 2)
 		binary.LittleEndian.PutUint16(modifiedDataAsBytes, modifiedData[0])
 
