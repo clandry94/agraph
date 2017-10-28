@@ -3,11 +3,6 @@ package agraph
 type FilterType int
 
 const (
-	// Filters
-	NopFilter    FilterType = iota
-	VolumeFilter FilterType = 2
-	DelayFilter FilterType = 3
-
 	SOURCE_SIZE = 512
 )
 
@@ -41,8 +36,8 @@ type Node interface {
 
 type NodeInitOptions struct {
 	VolumeMultiplier float32
-	Delay int
-	Decay float32
+	Delay            int
+	Decay            float32
 }
 
 type NodeInitOption func(*NodeInitOptions)
@@ -54,7 +49,7 @@ func VolumeMultiplier(m float32) NodeInitOption {
 }
 
 // delay in milliseconds
-func Delay(m int) NodeInitOption{
+func DelayLength(m int) NodeInitOption {
 	return func(args *NodeInitOptions) {
 		args.Delay = m
 	}
@@ -69,7 +64,7 @@ func Decay(m float32) NodeInitOption {
 func NewNode(t FilterType, name string, options ...NodeInitOption) (Node, error) {
 	args := &NodeInitOptions{
 		VolumeMultiplier: 0,
-		Delay: 0,
+		Delay:            0,
 	}
 
 	for _, option := range options {

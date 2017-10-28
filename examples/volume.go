@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	file, err := os.OpenFile("ringbackA.wav", os.O_RDWR, 066)
+	file, err := os.OpenFile("imperial_march.wav", os.O_RDWR, 066)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -46,12 +46,9 @@ func main() {
 			break
 		}
 
-		fmt.Printf("%v --> ", data)
 		volumeNode.Source() <- data
 		modifiedData := <-volumeNode.Sink()
-
-		fmt.Printf("%v\n", modifiedData)
-
+		
 		modifiedDataAsBytes := make([]byte, 2)
 		binary.LittleEndian.PutUint16(modifiedDataAsBytes, modifiedData[0])
 

@@ -2,6 +2,9 @@
 
 # Ignore the big wav file
 long_sample.wav
+delay.wav
+volume_increase.wav 
+delay_march.wav 
 
 # Binaries for programs and plugins
 *.exe

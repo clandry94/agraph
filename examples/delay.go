@@ -19,7 +19,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	f, err := os.Create("decay.wav")
+	f, err := os.Create("delay_march.wav")
 	defer f.Close()
 	if err != nil {
 		fmt.Println(err)
@@ -30,14 +30,14 @@ func main() {
 		agraph.SampleRate(int(reader.Fmt.Data.SampleRate)),
 		agraph.BitsPerSample(int(reader.Fmt.Data.BitsPerSample)))
 
-	reverbNode, _ := agraph.NewNode(agraph.DelayFilter,
+	delayNode, _ := agraph.NewNode(agraph.DelayFilter,
 		"volume1",
-		agraph.Delay(30000),
+		agraph.DelayLength(30000),
 		agraph.Decay(1.0))
 
-	reverbNode.SetSink(make(chan []uint16, 0))
+	delayNode.SetSink(make(chan []uint16, 0))
 
-	go reverbNode.Process()
+	go delayNode.Process()
 	start := time.Now()
 
 	for {
@@ -47,11 +47,8 @@ func main() {
 			break
 		}
 
-		fmt.Printf("%v --> ", data)
-		reverbNode.Source() <- data
-		modifiedData := <-reverbNode.Sink()
-
-		fmt.Printf("%v\n", modifiedData)
+		delayNode.Source() <- data
+		modifiedData := <-delayNode.Sink()
 
 		modifiedDataAsBytes := make([]byte, 2)
 		binary.LittleEndian.PutUint16(modifiedDataAsBytes, modifiedData[0])

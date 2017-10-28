@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
-	"io"
 )
 
 /*
@@ -103,7 +103,7 @@ func (r *WaveReader) ReadSampleInt16() ([]uint16, error) {
 	length := len(rawSample) / int(r.Fmt.Data.NumChannels)
 
 	for i := 0; i < int(r.Fmt.Data.NumChannels); i++ {
-		sample[i] = bytesToInt(rawSample[length * i : length * (i + 1)])
+		sample[i] = bytesToInt(rawSample[length*i : length*(i+1)])
 		if err != nil && err != io.EOF {
 			return sample, err
 		}
@@ -111,7 +111,6 @@ func (r *WaveReader) ReadSampleInt16() ([]uint16, error) {
 
 	return sample, nil
 }
-
 
 func bytesToInt(b []byte) uint16 {
 	var ret uint16
