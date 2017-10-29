@@ -38,6 +38,8 @@ type NodeInitOptions struct {
 	VolumeMultiplier float32
 	Delay            int
 	Decay            float32
+	MovingAverageLength int
+
 }
 
 type NodeInitOption func(*NodeInitOptions)
@@ -61,6 +63,12 @@ func Decay(m float32) NodeInitOption {
 	}
 }
 
+func MovingAverageLength(m int) NodeInitOption {
+	return func(args *NodeInitOptions) {
+		args.MovingAverageLength = m
+	}
+}
+
 func NewNode(t FilterType, name string, options ...NodeInitOption) (Node, error) {
 	args := &NodeInitOptions{
 		VolumeMultiplier: 0,
@@ -75,9 +83,11 @@ func NewNode(t FilterType, name string, options ...NodeInitOption) (Node, error)
 	case NopFilter:
 		return newNop(name)
 	case VolumeFilter:
-		return newVolume(args.VolumeMultiplier) // increase multiplier
+		return newVolume(name, args.VolumeMultiplier) // increase multiplier
 	case DelayFilter:
-		return newDelay(args.Delay, args.Decay)
+		return newDelay(name, args.Delay, args.Decay)
+	case FIRFilter:
+		return newFIR(name, args.MovingAverageLength)
 	default:
 		return newNop("default")
 	}

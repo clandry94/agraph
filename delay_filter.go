@@ -7,6 +7,7 @@ package agraph
 type Delay struct {
 	source      chan []uint16
 	sink        chan []uint16
+	name string
 	Delay       int // something such as 1.2, 0.3, etc
 	Decay       float32
 	i           int
@@ -14,10 +15,11 @@ type Delay struct {
 	delayBuffer []float32
 }
 
-func newDelay(delay int, decay float32) (Node, error) {
+func newDelay(name string, delay int, decay float32) (Node, error) {
 	return &Delay{
 		source:      make(chan []uint16, SOURCE_SIZE),
 		sink:        nil,
+		name: 		 name,
 		Delay:       delay,
 		i:           0,
 		delayBuffer: make([]float32, delay),

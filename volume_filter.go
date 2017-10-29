@@ -11,12 +11,14 @@ type Volume struct {
 	source     chan []uint16
 	sink       chan []uint16
 	Multiplier float32 // something such as 1.2, 0.3, etc
+	name string
 }
 
-func newVolume(multiplier float32) (Node, error) {
+func newVolume(name string, multiplier float32) (Node, error) {
 	return &Volume{
 		source:     make(chan []uint16, SOURCE_SIZE),
 		sink:       nil,
+		name: name,
 		Multiplier: multiplier,
 	}, nil
 }
