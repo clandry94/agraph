@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/clandry94/agraph"
 	"os"
 	"time"
+
+	"github.com/clandry94/agraph"
 )
 
 func main() {
@@ -20,10 +21,10 @@ func main() {
 	}
 
 	f, err := os.Create("volume_increase.wav")
-	defer f.Close()
 	if err != nil {
 		fmt.Println(err)
 	}
+	defer f.Close()
 
 	writer, err := agraph.NewWaveWriter(f,
 		agraph.NumChannels(int(reader.Fmt.Data.NumChannels)),
