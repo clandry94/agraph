@@ -1,24 +1,25 @@
 package agraph
 
+import "container/list"
 
 /*
 	FIR moving average filter
 */
 type FIR struct {
-	source chan []uint16
-	sink   chan []uint16
-	Name   string
-	maBuffer [][]uint16 // maybe needs to be a pointer
-	maSize int
+	source    chan []uint16
+	sink      chan []uint16
+	Name      string
+	tapBuffer *list.List // maybe needs to be a pointer
+	tapCount  int
 }
 
 func newFIR(name string, maSize int) (Node, error) {
 	return &FIR{
-		source: make(chan []uint16, SOURCE_SIZE),
-		sink:   nil,
-		Name:   name,
-		maBuffer: make([][]uint16, 0),
-		maSize: maSize,
+		source:    make(chan []uint16, SOURCE_SIZE),
+		sink:      nil,
+		Name:      name,
+		tapBuffer: list.New(),
+		tapCount:  maSize,
 	}, nil
 }
 
@@ -52,18 +53,16 @@ func (n *FIR) Process() error {
 func (n *FIR) do(data []uint16) ([]uint16, error) {
 	var movAvg float64
 	movAvg = 0.0
-	if len(n.maBuffer) < n.maSize {
-		n.maBuffer = append(n.maBuffer, data)
-	} else {
-		x := (n.maBuffer)[:n.maSize-1][0]
-		z := make([][]uint16, 1)
-		val := make([]uint16, 1)
-		z[0] = val
-		n.maBuffer = append(z, x)
-	}
 
-	for _, sample := range n.maBuffer {
-		movAvg += float64(sample[0]) * (1 / float64(n.maSize))
+	if n.tapBuffer.Len() >= n.tapCount {
+		n.tapBuffer.Remove(n.tapBuffer.Back())
+	}
+	n.tapBuffer.PushFront(data)
+
+	p := n.tapBuffer.Front()
+	for p.Next() != nil {
+		movAvg += float64(p.Value.([]uint16)[0]) * (1 / float64(n.tapCount))
+		p = p.Next()
 	}
 
 	data[0] = uint16(movAvg)

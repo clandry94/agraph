@@ -63,7 +63,7 @@ func Decay(m float32) NodeInitOption {
 	}
 }
 
-func MovingAverageLength(m int) NodeInitOption {
+func Taps(m int) NodeInitOption {
 	return func(args *NodeInitOptions) {
 		args.MovingAverageLength = m
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	file, err := os.OpenFile("imperial_march.wav", os.O_RDWR, 066)
+	file, err := os.OpenFile("buttons.wav", os.O_RDWR, 066)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -19,7 +19,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	f, err := os.Create("fir_march.wav")
+	f, err := os.Create("buttons_fir.wav")
 	defer f.Close()
 	if err != nil {
 		fmt.Println(err)
@@ -32,7 +32,7 @@ func main() {
 
 	firNode, _ := agraph.NewNode(agraph.FIRFilter,
 		"moving_average",
-		agraph.MovingAverageLength(40))
+		agraph.Taps(10))
 
 	firNode.SetSink(make(chan []uint16, 0))
 
