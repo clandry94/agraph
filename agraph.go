@@ -11,19 +11,22 @@ type Graph struct {
 	root   *Node
 }
 
+// Meta is a type which has information about a file
 type Meta struct {
 	Filepath string
 	Size     int64
 }
 
+// New returns a new *Graph if file exists, otherwise returns an error
 func New(filepath string) (*Graph, error) {
-	_, err := os.OpenFile(filepath, os.O_RDWR, 0666)
+	f, err := os.Stat(filepath)
 	if err != nil {
 		return nil, err
 	}
 
 	meta := Meta{
 		Filepath: filepath,
+		Size:     f.Size(),
 	}
 
 	/*
