@@ -19,14 +19,14 @@ if err != nil {
 	fmt.Println(err)
 }
 
-convolutionNode, _ := agraph.NewNode(agraph.ConvolutionFilter, "convoluter")
-volumeNode, _ := agraph.NewNode(agraph.VolumeFilter, "volume booster")
+firNode, _ := agraph.NewNode(agraph.firFilter, "finite impulse response")
+delayNode, _ := agraph.NewNode(agraph.delayFilter, "delay")
 
-convolutionNode.SetSink(volumeNode.Source())
-volumeNode.SetSink(make(chan []float64, agraph.SOURCE_SIZE)
+firNode.SetSink(delayNode.Source())
+delayNode.SetSink(make(chan []float64, agraph.SOURCE_SIZE)
 
-go convolutionNode.Process()
-go volumeNode.Process()
+go firNode.Process()
+go delayNode.Process()
 
 for {
     data, err := reader.ReadSampleFloat()
@@ -35,8 +35,8 @@ for {
         break
     }
 
-    convolutionNode.Source() <- data
-    filteredData = <- volumeNode.Sink()
+    firNode.Source() <- data
+    filteredData = <- delayNode.Sink()
 }
 ```
 
