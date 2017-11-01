@@ -10,7 +10,7 @@ I decided to make my own.
 # Usage
 
 Using this library is simple, all you need to do is initialize filter nodes, connect them, start each node, then
-feed your wave pulse code modulated (PCM) data into the first sink. Below is an example of creating an audio file reader,
+feed your pulse code modulated (PCM) wave data into the first sink. Below is an example of creating an audio file reader,
 setting up a graph with a convolution filter and a volume filter, and pumping data through it.
 
 ```
@@ -45,7 +45,7 @@ for {
 - ~wave file writing~
 - Convolution filter
 - ~Delay Filter~
-- Finite Impulse Response filter
+- ~Finite Impulse Response filter~
 - ~volume filter~ (was the first filter, so is technically not correct in many ways)
 - leaky integrator filter
 - FFT
