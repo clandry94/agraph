@@ -39,7 +39,7 @@ type NodeInitOptions struct {
 	Delay            int
 	Decay            float32
 	MovingAverageLength int
-
+	Angle			 float64
 }
 
 type NodeInitOption func(*NodeInitOptions)
@@ -69,6 +69,12 @@ func Taps(m int) NodeInitOption {
 	}
 }
 
+func Angle(m float64) NodeInitOption {
+	return func(args *NodeInitOptions) {
+		args.Angle = m
+	}
+}
+
 func NewNode(t FilterType, name string, options ...NodeInitOption) (Node, error) {
 	args := &NodeInitOptions{
 		VolumeMultiplier: 0,
@@ -88,6 +94,8 @@ func NewNode(t FilterType, name string, options ...NodeInitOption) (Node, error)
 		return newDelay(name, args.Delay, args.Decay)
 	case FIRFilter:
 		return newFIR(name, args.MovingAverageLength)
+	case LocalizationFilter:
+		return newLocalization(name, args.Angle)
 	default:
 		return newNop("default")
 	}

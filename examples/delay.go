@@ -32,7 +32,7 @@ func main() {
 
 	delayNode, _ := agraph.NewNode(agraph.DelayFilter,
 		"delay1",
-		agraph.DelayLength(30000),
+		agraph.DelayLength(220),
 		agraph.Decay(1.0))
 
 	delayNode.SetSink(make(chan []uint16, 0))

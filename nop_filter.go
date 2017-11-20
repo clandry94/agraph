@@ -1,8 +1,14 @@
 package agraph
 
+
 /*
 	Null operation filter. Does nothing.
+
+	Assuming a simple, spherical head and that the sound sources are
+	infinitely far away s.t. the sound reaches the ears
+    in a straight line
 */
+
 type Nop struct {
 	source chan []uint16
 	sink   chan []uint16
@@ -10,6 +16,7 @@ type Nop struct {
 }
 
 func newNop(name string) (Node, error) {
+
 	return &Nop{
 		source: make(chan []uint16, SOURCE_SIZE),
 		sink:   nil,
@@ -47,3 +54,4 @@ func (n *Nop) Process() error {
 func (n *Nop) do(data []uint16) ([]uint16, error) {
 	return data, nil
 }
+

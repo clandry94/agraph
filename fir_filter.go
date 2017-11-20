@@ -1,6 +1,9 @@
 package agraph
 
-import "container/list"
+import (
+	"container/list"
+	"math"
+)
 
 /*
 	FIR moving average filter
@@ -65,7 +68,7 @@ func (n *FIR) do(data []uint16) ([]uint16, error) {
 		p = p.Next()
 	}
 
-	data[0] = uint16(movAvg)
+	data[0] = uint16(math.Floor(movAvg))
 
 	return data, nil
 }
