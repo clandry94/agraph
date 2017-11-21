@@ -115,15 +115,15 @@ func (r *WaveReader) ReadSampleInt16() ([]uint16, error) {
 func bytesToInt(b []byte) uint16 {
 	var ret uint16
 	switch len(b) {
-	case 1:
+	case 1: // 8-bit
 		// 0 ~ 128 ~ 255
 		ret = uint16(b[0])
-	case 2:
+	case 2: // 16-bit
 		// -32768 ~ 0 ~ 32767
 		ret = uint16(b[0]) + uint16(b[1])<<8
 		//	fmt.Printf("%08b %08b ", b[1], b[0])
 		//	fmt.Printf("%016b => %d\n", ret, ret)
-	case 3:
+	case 3: // 24-bit
 		// HiReso / DVDAudio
 		ret = uint16(b[0]) + uint16(b[1])<<8 + uint16(b[2])<<16
 	default:
