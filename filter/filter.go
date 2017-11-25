@@ -1,9 +1,16 @@
-package agraph
+package filter
 
-type FilterType int
+type Type int
 
 const (
 	SOURCE_SIZE = 512
+
+	// Filters
+	NopFilter    	   Type = 1
+	VolumeFilter	   Type = 2
+	DelayFilter  	   Type = 3
+	FIRFilter    	   Type = 4
+	LocalizationFilter Type = 5
 )
 
 // Filters are implemented as structs which implement the type Node. Filters
@@ -34,7 +41,12 @@ type Node interface {
 	Sink() chan []uint16
 }
 
-type NodeInitOptions struct {
+type MetaData struct {
+	SampleRate uint32
+	NumChannels uint16
+}
+
+type Options struct {
 	VolumeMultiplier float32
 	Delay            int
 	Decay            float32
@@ -42,41 +54,41 @@ type NodeInitOptions struct {
 	Angle			 float64
 }
 
-type NodeInitOption func(*NodeInitOptions)
+type NodeInitOption func(*Options)
 
 func VolumeMultiplier(m float32) NodeInitOption {
-	return func(args *NodeInitOptions) {
+	return func(args *Options) {
 		args.VolumeMultiplier = m
 	}
 }
 
 // delay in milliseconds
 func DelayLength(m int) NodeInitOption {
-	return func(args *NodeInitOptions) {
+	return func(args *Options) {
 		args.Delay = m
 	}
 }
 
 func Decay(m float32) NodeInitOption {
-	return func(args *NodeInitOptions) {
+	return func(args *Options) {
 		args.Decay = m
 	}
 }
 
 func Taps(m int) NodeInitOption {
-	return func(args *NodeInitOptions) {
+	return func(args *Options) {
 		args.MovingAverageLength = m
 	}
 }
 
 func Angle(m float64) NodeInitOption {
-	return func(args *NodeInitOptions) {
+	return func(args *Options) {
 		args.Angle = m
 	}
 }
 
-func NewNode(t FilterType, name string, options ...NodeInitOption) (Node, error) {
-	args := &NodeInitOptions{
+func NewNode(t Type, meta MetaData, name string, options ...NodeInitOption) (Node, error) {
+	args := &Options{
 		VolumeMultiplier: 0,
 		Delay:            0,
 	}
@@ -87,16 +99,16 @@ func NewNode(t FilterType, name string, options ...NodeInitOption) (Node, error)
 
 	switch t {
 	case NopFilter:
-		return newNop(name)
+		return newNop(name, meta)
 	case VolumeFilter:
-		return newVolume(name, args.VolumeMultiplier) // increase multiplier
+		return newVolume(name, meta, args.VolumeMultiplier) // increase multiplier
 	case DelayFilter:
-		return newDelay(name, args.Delay, args.Decay)
+		return newDelay(name, meta, args.Delay, args.Decay)
 	case FIRFilter:
-		return newFIR(name, args.MovingAverageLength)
+		return newFIR(name, meta, args.MovingAverageLength)
 	case LocalizationFilter:
-		return newLocalization(name, args.Angle)
+		return newLocalization(name, meta, args.Angle)
 	default:
-		return newNop("default")
+		return newNop("default", meta)
 	}
 }

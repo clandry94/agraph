@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewWaveReader(t *testing.T) {
-	file, err := os.OpenFile("examples/ringbackA.wav", os.O_RDWR, 066)
+	file, err := os.OpenFile("examples/ringbackB.wav", os.O_RDWR, 066)
 	if err != nil {
 		t.Error(err)
 	}
@@ -82,12 +82,14 @@ func TestNewWaveReader(t *testing.T) {
 		t.Errorf("Actual subchunk2 size %v is not equal to expected size %v", reader.data.Size, expectedSubChunk1Size)
 	}
 
+	/*
 	fmt.Printf("AudioFormat: %v\n", reader.Fmt.Data.AudioFormat)
 	fmt.Printf("NumChannels: %v\n", reader.Fmt.Data.NumChannels)
 	fmt.Printf("SampleRate: %v\n", reader.Fmt.Data.SampleRate)
 	fmt.Printf("ByteRate: %v\n", reader.Fmt.Data.ByteRate)
 	fmt.Printf("BlockAlign: %v\n", reader.Fmt.Data.BlockAlign)
 	fmt.Printf("BitsPerSample: %v\n", reader.Fmt.Data.BitsPerSample)
+	*/
 }
 
 func TestRead(t *testing.T) {

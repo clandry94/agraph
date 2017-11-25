@@ -42,7 +42,7 @@ func NewWaveReader(fp *os.File) (*WaveReader, error) {
 		return nil, err
 	}
 
-	fmt.Printf("File Size: %v\n", fStat.Size())
+	//fmt.Printf("File Size: %v\n", fStat.Size())
 	reader := new(WaveReader)
 	reader.size = fStat.Size()
 	reader.in = bytes.NewReader(data)
@@ -137,8 +137,8 @@ func (r *WaveReader) parseRiffChunk() error {
 
 	// Read the RIFF token from the
 	err := binary.Read(r.in, binary.BigEndian, chunkId)
-	fmt.Printf("Chunk ID in bytes: %v\n", chunkId)
-	fmt.Printf("Chunk ID as string: %v\n", string(chunkId))
+	//fmt.Printf("Chunk ID in bytes: %v\n", chunkId)
+	//fmt.Printf("Chunk ID as string: %v\n", string(chunkId))
 	if err != nil {
 		return err
 	}
@@ -158,9 +158,9 @@ func (r *WaveReader) parseRiffChunk() error {
 		return err
 	}
 
-	fmt.Printf("Chunk Size in Bytes: %v\n", chunkSizeBytes)
+	//fmt.Printf("Chunk Size in Bytes: %v\n", chunkSizeBytes)
 	chunkSize := binary.LittleEndian.Uint32(chunkSizeBytes)
-	fmt.Printf("Chunk size as decimal %v\n", chunkSize)
+	//fmt.Printf("Chunk size as decimal %v\n", chunkSize)
 
 	if chunkSize != uint32(r.size)-8 {
 		return fmt.Errorf("RIFF Chunk Size %v must == file size-8 bytes %v", chunkSize, r.size-8)

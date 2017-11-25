@@ -1,4 +1,4 @@
-package agraph
+package filter
 
 import (
 	"testing"

@@ -57,12 +57,12 @@ func main() {
 		binary.LittleEndian.PutUint16(leftByte, modifiedData[0])
 		binary.LittleEndian.PutUint16(rightByte, modifiedData[1])
 
-/*
+
 		fmt.Print("Packet Info: \n")
 		fmt.Printf(" - Original [%v]uint16 = %v \n", len(data), data)
 		// fmt.Printf(" - Modified [%v]uint16 = %v \n", len(data), data)
 		fmt.Printf(" - L: [%v]byte = %v \n - R: [%v]byte = %v \n", len(leftByte), leftByte, len(rightByte), rightByte)
-*/
+
 
 		// pack all the bytes into the correct ordering
 		fullByte := make([]byte, 4)

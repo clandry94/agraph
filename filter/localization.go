@@ -1,4 +1,4 @@
-package agraph
+package filter
 
 import (
 	"time"
@@ -39,21 +39,31 @@ type Localization struct {
 	source chan []uint16
 	sink   chan []uint16
 	Name   string
+	meta   MetaData
 	Angle  float64
 	itd    time.Duration
+	isd    int
+	buffer chan []uint16
 }
 
-func newLocalization(name string, angle float64) (Node, error) {
+func newLocalization(name string, meta MetaData, angle float64) (Node, error) {
 	itd, err := itd(angle, R, C)
 	if err != nil {
 		return nil, err
 	}
+
+	// interaural sample delay = time (ms) * sampleRate
+	// NEED SAMPLE RATE!!
+	//isd := (itd.Seconds() / 1000) *
+
 	return &Localization{
 		source: make(chan []uint16, SOURCE_SIZE),
 		sink:   nil,
 		Name:   name,
+		meta:   meta,
 		Angle: angle,
 		itd: 	itd,
+		isd: 	0,
 	}, nil
 }
 

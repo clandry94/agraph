@@ -1,4 +1,4 @@
-package agraph
+package filter
 
 import (
 	"container/list"
@@ -12,15 +12,17 @@ type FIR struct {
 	source    chan []uint16
 	sink      chan []uint16
 	Name      string
+	meta      MetaData
 	tapBuffer *list.List // maybe needs to be a pointer
 	tapCount  int
 }
 
-func newFIR(name string, maSize int) (Node, error) {
+func newFIR(name string, meta MetaData, maSize int) (Node, error) {
 	return &FIR{
 		source:    make(chan []uint16, SOURCE_SIZE),
 		sink:      nil,
 		Name:      name,
+		meta: 	meta,
 		tapBuffer: list.New(),
 		tapCount:  maSize,
 	}, nil

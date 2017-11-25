@@ -1,51 +1,47 @@
 package agraph
 
 import (
-	"os"
+	"github.com/clandry94/agraph/filter"
 )
 
 type Graph struct {
-	Meta   Meta
-	source *[]float64
-	sink   *[]float64
-	root   *Node
+	Meta   MetaData
+	graph  *graph
 }
 
+type graph struct {
+
+}
+
+type Fields map[string]interface{}
+
 // Meta is a type which has information about a file
-type Meta struct {
-	Filepath string
-	Size     int64
+type MetaData struct {
+	SampleRate uint32
+	NumChannels uint16
+}
+
+type GraphDef struct {
+	filters []*FilterDef
+}
+
+type FilterDef struct {
+	filter filter.Type
+	fields Fields
+}
+
+func NewFilter(filter filter.Type, fields Fields) *FilterDef{
+	return &FilterDef {
+		filter: filter,
+		fields: fields,
+	}
 }
 
 // New returns a new *Graph if file exists, otherwise returns an error
-func New(filepath string) (*Graph, error) {
-	f, err := os.Stat(filepath)
-	if err != nil {
-		return nil, err
-	}
-
-	meta := Meta{
-		Filepath: filepath,
-		Size:     f.Size(),
-	}
-
-	/*
-		reader, err := NewWaveReader(file)
-		if err != nil {
-			return &Graph{}, err
-		}
-	*/
-
-	/*
-		codec := Mp3{
-			file: file,
-		}
-	*/
+func New(graphDefinition *GraphDef, meta MetaData) (*Graph, error) {
 
 	return &Graph{
 		Meta:   meta,
-		source: nil,
-		sink:   nil,
-		root:   nil,
+		graph: nil,
 	}, nil
 }

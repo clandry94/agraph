@@ -1,26 +1,24 @@
-package agraph
+package filter
 
 
 /*
 	Null operation filter. Does nothing.
-
-	Assuming a simple, spherical head and that the sound sources are
-	infinitely far away s.t. the sound reaches the ears
-    in a straight line
 */
 
 type Nop struct {
 	source chan []uint16
 	sink   chan []uint16
 	Name   string
+	meta   MetaData
 }
 
-func newNop(name string) (Node, error) {
+func newNop(name string, meta MetaData) (Node, error) {
 
 	return &Nop{
 		source: make(chan []uint16, SOURCE_SIZE),
 		sink:   nil,
 		Name:   name,
+		meta: meta,
 	}, nil
 }
 

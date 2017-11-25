@@ -1,4 +1,4 @@
-package agraph
+package filter
 
 import (
 	"fmt"
@@ -10,15 +10,17 @@ import (
 type Volume struct {
 	source     chan []uint16
 	sink       chan []uint16
+	meta       MetaData
 	Multiplier float32 // something such as 1.2, 0.3, etc
 	name string
 }
 
-func newVolume(name string, multiplier float32) (Node, error) {
+func newVolume(name string, meta MetaData, multiplier float32) (Node, error) {
 	return &Volume{
 		source:     make(chan []uint16, SOURCE_SIZE),
 		sink:       nil,
 		name: name,
+		meta: meta,
 		Multiplier: multiplier,
 	}, nil
 }
