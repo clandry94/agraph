@@ -30,9 +30,13 @@ func main() {
 		agraph.SampleRate(int(reader.Fmt.Data.SampleRate)),
 		agraph.BitsPerSample(int(reader.Fmt.Data.BitsPerSample)))
 
-	localizationNode, _ := agraph.NewNode(agraph.LocalizationFilter,
+	localizationNode, err := agraph.NewNode(agraph.LocalizationFilter,
 		"localization",
-		agraph.Angle(0))
+		agraph.Angle(-45))
+
+	if err != nil {
+		panic(err)
+	}
 
 	localizationNode.SetSink(make(chan []uint16, 0))
 
@@ -51,18 +55,16 @@ func main() {
 		modifiedData := <-localizationNode.Sink()
 		//fmt.Printf("Localized: %v\n", modifiedData)
 
-
 		leftByte := make([]byte, 2)
 		rightByte := make([]byte, 2)
 		binary.LittleEndian.PutUint16(leftByte, modifiedData[0])
 		binary.LittleEndian.PutUint16(rightByte, modifiedData[1])
 
-/*
 		fmt.Print("Packet Info: \n")
 		fmt.Printf(" - Original [%v]uint16 = %v \n", len(data), data)
 		// fmt.Printf(" - Modified [%v]uint16 = %v \n", len(data), data)
 		fmt.Printf(" - L: [%v]byte = %v \n - R: [%v]byte = %v \n", len(leftByte), leftByte, len(rightByte), rightByte)
-*/
+
 
 		// pack all the bytes into the correct ordering
 		fullByte := make([]byte, 4)
@@ -76,7 +78,6 @@ func main() {
 
 
 		// fmt.Println()
-
 		writer.Write(fullByte)
 	}
 

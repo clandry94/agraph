@@ -4,6 +4,9 @@ import (
 	"time"
 	"math"
 	"strconv"
+	"container/list"
+	"fmt"
+	"strings"
 )
 
 /*
@@ -27,12 +30,13 @@ import (
 			x          x
 			 x        x
 				x  x
-		      180°/-180°
+		     -180°/180°
 */
 
 const (
 	R = 9   // radius of the head in cm
 	C = 345 // speed of sound in m/s
+	sampleRate = 8000  // won't work with audio that isn't 8000 (won't give the proper delay length)
 )
 
 type Localization struct {
@@ -41,6 +45,9 @@ type Localization struct {
 	Name   string
 	Angle  float64
 	itd    time.Duration
+	sampleDelay int
+	delayChannel int
+	delayBuf *list.List
 }
 
 func newLocalization(name string, angle float64) (Node, error) {
@@ -48,12 +55,27 @@ func newLocalization(name string, angle float64) (Node, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	delayChannel := 0
+
+	if angle > 0 {
+		delayChannel = 1
+	}
+
+	fmt.Printf("sample delay info: \n  - itd seconds: %v \n  - sampleRate: %v \n", itd.Seconds(), sampleRate)
+
+	// number of samples to buffer
+	sampleDelay := int(math.Floor(itd.Seconds() * sampleRate))
+
 	return &Localization{
 		source: make(chan []uint16, SOURCE_SIZE),
 		sink:   nil,
 		Name:   name,
 		Angle: angle,
 		itd: 	itd,
+		sampleDelay: sampleDelay,
+		delayChannel: delayChannel,
+		delayBuf: list.New(),
 	}, nil
 }
 
@@ -85,19 +107,46 @@ func (n *Localization) Process() error {
 }
 
 func (n *Localization) do(data []uint16) ([]uint16, error) {
+	// add samples to the buffer if it isn't full
+	if n.delayBuf.Len() < n.sampleDelay {
+		n.delayBuf.PushFront(data[n.delayChannel])
+	}
+	fmt.Println(n.sampleDelay)
+	fmt.Printf("LENGH OF DELAY BUF: %v\n", n.delayBuf.Len())
+
+	// if the buffer is full, replace the sample with the value
+	if n.delayBuf.Len() == n.sampleDelay {
+		samp := n.delayBuf.Front().Value.(uint16)
+		n.delayBuf.Remove(n.delayBuf.Front())
+		data[n.delayChannel] = samp
+	} else {
+		// otherwise, set that sample in the data stream to 0
+		data[n.delayChannel] = 0
+	}
+
 	return data, nil
 }
 
 // interaural time difference (ITD)
 // ∆t = r/c(θ + sin(θ))
+// angle is in degrees coming in
 func itd(angle float64, radius float64, c float64) (time.Duration, error) {
+
+	angRad := angle * 0.0174533
+
 	// calculate the itd
-	itd := (radius / c) * (angle + math.Sin(angle))
+	itd := math.Abs((radius / c) * (angRad + math.Sin(angle)))
 
 	// prepare the itd to be parsed as a duration
 	itdStrConv := strconv.FormatFloat(itd, 'f', -1, 64)
+	fmt.Println(itdStrConv)
+	unitIdent := "s"
+	itdStrArr := []string{itdStrConv, unitIdent}
+
+
+	itdStr := strings.Join(itdStrArr, "")
 
 	// duration
-	return time.ParseDuration(itdStrConv)
+	return time.ParseDuration(itdStr)
 }
 
