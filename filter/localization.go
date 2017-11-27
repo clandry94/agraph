@@ -71,6 +71,10 @@ func (n *Localization) SetSink(c chan []uint16) {
 	n.sink = c
 }
 
+func (n *Localization) SetSource(c chan []uint16) {
+	n.source = c
+}
+
 func (n *Localization) Source() chan []uint16 {
 	return n.source
 }

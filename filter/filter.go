@@ -37,6 +37,7 @@ type Node interface {
 	Process() error
 	do(data []uint16) ([]uint16, error)
 	SetSink(c chan []uint16)
+	SetSource(c chan []uint16)
 	Source() chan []uint16
 	Sink() chan []uint16
 }
@@ -54,60 +55,19 @@ type Options struct {
 	Angle			 float64
 }
 
-type NodeInitOption func(*Options)
-
-func VolumeMultiplier(m float32) NodeInitOption {
-	return func(args *Options) {
-		args.VolumeMultiplier = m
-	}
-}
-
-// delay in milliseconds
-func DelayLength(m int) NodeInitOption {
-	return func(args *Options) {
-		args.Delay = m
-	}
-}
-
-func Decay(m float32) NodeInitOption {
-	return func(args *Options) {
-		args.Decay = m
-	}
-}
-
-func Taps(m int) NodeInitOption {
-	return func(args *Options) {
-		args.MovingAverageLength = m
-	}
-}
-
-func Angle(m float64) NodeInitOption {
-	return func(args *Options) {
-		args.Angle = m
-	}
-}
-
-func NewNode(t Type, meta MetaData, name string, options ...NodeInitOption) (Node, error) {
-	args := &Options{
-		VolumeMultiplier: 0,
-		Delay:            0,
-	}
-
-	for _, option := range options {
-		option(args)
-	}
+func NewNode(t Type, meta MetaData, name string, options Options) (Node, error) {
 
 	switch t {
 	case NopFilter:
 		return newNop(name, meta)
 	case VolumeFilter:
-		return newVolume(name, meta, args.VolumeMultiplier) // increase multiplier
+		return newVolume(name, meta, options.VolumeMultiplier) // increase multiplier
 	case DelayFilter:
-		return newDelay(name, meta, args.Delay, args.Decay)
+		return newDelay(name, meta, options.Delay, options.Decay)
 	case FIRFilter:
-		return newFIR(name, meta, args.MovingAverageLength)
+		return newFIR(name, meta, options.MovingAverageLength)
 	case LocalizationFilter:
-		return newLocalization(name, meta, args.Angle)
+		return newLocalization(name, meta, options.Angle)
 	default:
 		return newNop("default", meta)
 	}

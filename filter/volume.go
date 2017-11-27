@@ -29,6 +29,10 @@ func (n *Volume) SetSink(c chan []uint16) {
 	n.sink = c
 }
 
+func (n *Volume) SetSource(c chan []uint16) {
+	n.source = c
+}
+
 func (n *Volume) Source() chan []uint16 {
 	return n.source
 }

@@ -26,6 +26,10 @@ func (n *Nop) SetSink(c chan []uint16) {
 	n.sink = c
 }
 
+func (n *Nop) SetSource(c chan []uint16) {
+	n.source = c
+}
+
 func (n *Nop) Source() chan []uint16 {
 	return n.source
 }

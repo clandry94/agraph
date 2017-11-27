@@ -6,6 +6,7 @@ import (
 	"github.com/clandry94/agraph"
 	"os"
 	"time"
+	"github.com/clandry94/agraph/filter"
 )
 
 func main() {
@@ -30,7 +31,7 @@ func main() {
 		agraph.SampleRate(int(reader.Fmt.Data.SampleRate)),
 		agraph.BitsPerSample(int(reader.Fmt.Data.BitsPerSample)))
 
-	localizationNode, _ := agraph.NewNode(agraph.LocalizationFilter,
+	localizationNode, _ := filter.NewNode(filter.LocalizationFilter,
 		"localization",
 		agraph.Angle(0))
 

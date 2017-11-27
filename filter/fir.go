@@ -40,6 +40,10 @@ func (n *FIR) Sink() chan []uint16 {
 	return n.sink
 }
 
+func (n *FIR) SetSource(c chan []uint16) {
+	n.source = c
+}
+
 func (n *FIR) Process() error {
 	for {
 		select {

@@ -33,6 +33,10 @@ func (n *Delay) SetSink(c chan []uint16) {
 	n.sink = c
 }
 
+func (n *Delay) SetSource(c chan []uint16) {
+	n.source = c
+}
+
 func (n *Delay) Source() chan []uint16 {
 	return n.source
 }

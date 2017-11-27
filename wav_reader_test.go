@@ -83,12 +83,12 @@ func TestNewWaveReader(t *testing.T) {
 	}
 
 	/*
-	fmt.Printf("AudioFormat: %v\n", reader.Fmt.Data.AudioFormat)
-	fmt.Printf("NumChannels: %v\n", reader.Fmt.Data.NumChannels)
-	fmt.Printf("SampleRate: %v\n", reader.Fmt.Data.SampleRate)
-	fmt.Printf("ByteRate: %v\n", reader.Fmt.Data.ByteRate)
-	fmt.Printf("BlockAlign: %v\n", reader.Fmt.Data.BlockAlign)
-	fmt.Printf("BitsPerSample: %v\n", reader.Fmt.Data.BitsPerSample)
+		fmt.Printf("AudioFormat: %v\n", reader.Fmt.Data.AudioFormat)
+		fmt.Printf("NumChannels: %v\n", reader.Fmt.Data.NumChannels)
+		fmt.Printf("SampleRate: %v\n", reader.Fmt.Data.SampleRate)
+		fmt.Printf("ByteRate: %v\n", reader.Fmt.Data.ByteRate)
+		fmt.Printf("BlockAlign: %v\n", reader.Fmt.Data.BlockAlign)
+		fmt.Printf("BitsPerSample: %v\n", reader.Fmt.Data.BitsPerSample)
 	*/
 }
 
