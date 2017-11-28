@@ -36,7 +36,7 @@ import (
 const (
 	R = 9   // radius of the head in cm
 	C = 345 // speed of sound in m/s
-	sampleRate = 8000  // won't work with audio that isn't 8000 (won't give the proper delay length)
+	sampleRate = 22050  // won't work with audio that isn't 8000 (won't give the proper delay length)
 )
 
 type Localization struct {
@@ -62,10 +62,13 @@ func newLocalization(name string, angle float64) (Node, error) {
 		delayChannel = 1
 	}
 
-	fmt.Printf("sample delay info: \n  - itd seconds: %v \n  - sampleRate: %v \n", itd.Seconds(), sampleRate)
-
 	// number of samples to buffer
 	sampleDelay := int(math.Floor(itd.Seconds() * sampleRate))
+
+	fmt.Printf("sample delay info: \n" +
+		"  - itd seconds: %v \n" +
+		"  - sampleRate: %v \n" +
+		"  - sample delay %v \n", itd.Seconds(), sampleRate, sampleDelay)
 
 	return &Localization{
 		source: make(chan []uint16, SOURCE_SIZE),
@@ -111,13 +114,14 @@ func (n *Localization) do(data []uint16) ([]uint16, error) {
 	if n.delayBuf.Len() < n.sampleDelay {
 		n.delayBuf.PushFront(data[n.delayChannel])
 	}
-	fmt.Println(n.sampleDelay)
-	fmt.Printf("LENGH OF DELAY BUF: %v\n", n.delayBuf.Len())
+	//fmt.Println(n.sampleDelay)
+	//fmt.Printf("LENGH OF DELAY BUF: %v\n", n.delayBuf.Len())
 
 	// if the buffer is full, replace the sample with the value
 	if n.delayBuf.Len() == n.sampleDelay {
-		samp := n.delayBuf.Front().Value.(uint16)
-		n.delayBuf.Remove(n.delayBuf.Front())
+		samp := n.delayBuf.Back().Value.(uint16)
+		//fmt.Printf("Reading from buffer! \n  - samp uint16: %v \n", samp)
+		n.delayBuf.Remove(n.delayBuf.Back())
 		data[n.delayChannel] = samp
 	} else {
 		// otherwise, set that sample in the data stream to 0

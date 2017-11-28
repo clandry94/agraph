@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	file, err := os.OpenFile("M1F1-Alaw-AFsp.wav", os.O_RDWR, 066)
+	file, err := os.OpenFile("guns/gun_war-2-stereo.wav", os.O_RDWR, 066)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -19,7 +19,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	f, err := os.Create("M1F1-Alaw-AFsp_localized.wav")
+	f, err := os.Create("15_left_gun_war-2.wav")
 	defer f.Close()
 	if err != nil {
 		fmt.Println(err)
@@ -32,7 +32,7 @@ func main() {
 
 	localizationNode, err := agraph.NewNode(agraph.LocalizationFilter,
 		"localization",
-		agraph.Angle(-45))
+		agraph.Angle(15))
 
 	if err != nil {
 		panic(err)
@@ -43,11 +43,23 @@ func main() {
 	go localizationNode.Process()
 	start := time.Now()
 
+	i := 0
+	var originalFirstSample uint16
 	for {
+		//fmt.Printf("i: %v\n", i)
+		if i == 1885 {
+			fmt.Printf("Original First Sample: %v\n", originalFirstSample)
+			//panic("PAUSE")
+		}
+
 		data, err := reader.ReadSampleInt16()
 		if err != nil {
 			fmt.Println(err)
 			break
+		}
+
+		if i == 0 {
+			originalFirstSample = data[0]
 		}
 
 
@@ -60,11 +72,13 @@ func main() {
 		binary.LittleEndian.PutUint16(leftByte, modifiedData[0])
 		binary.LittleEndian.PutUint16(rightByte, modifiedData[1])
 
+
+		/*
 		fmt.Print("Packet Info: \n")
 		fmt.Printf(" - Original [%v]uint16 = %v \n", len(data), data)
-		// fmt.Printf(" - Modified [%v]uint16 = %v \n", len(data), data)
+		fmt.Printf(" - Modified [%v]uint16 = %v \n", len(modifiedData), modifiedData)
 		fmt.Printf(" - L: [%v]byte = %v \n - R: [%v]byte = %v \n", len(leftByte), leftByte, len(rightByte), rightByte)
-
+		*/
 
 		// pack all the bytes into the correct ordering
 		fullByte := make([]byte, 4)
@@ -79,6 +93,7 @@ func main() {
 
 		// fmt.Println()
 		writer.Write(fullByte)
+		i++
 	}
 
 	writer.Close()
